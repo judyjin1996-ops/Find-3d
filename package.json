@@ -32,5 +32,6 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
-  }
+  },
+  "homepage": "https://judyjin1996-ops.github.io/Find-3d/"
 }

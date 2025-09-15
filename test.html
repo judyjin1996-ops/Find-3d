@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find 3D - 功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-item {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .success { border-left-color: #28a745; }
+        .warning { border-left-color: #ffc107; }
+        .info { border-left-color: #17a2b8; }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn:hover { background: #5a6fd8; }
+        img { max-width: 200px; height: auto; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Find 3D - 功能测试页面</h1>
+    
+    <div class="test-item success">
+        <h3>✅ 网站部署状态</h3>
+        <p>Find 3D已成功部署到Netlify，可以正常访问。</p>
+        <a href="/" class="btn">返回主页</a>
+    </div>
+
+    <div class="test-item info">
+        <h3>🔍 搜索功能测试</h3>
+        <p>测试步骤：</p>
+        <ol>
+            <li>在搜索框中输入"日本建筑"</li>
+            <li>点击搜索按钮</li>
+            <li>查看搜索结果是否正常显示</li>
+        </ol>
+        <p><strong>预期结果</strong>: 显示多个3D建筑模型卡片</p>
+    </div>
+
+    <div class="test-item info">
+        <h3>🖼️ 预览图测试</h3>
+        <p>测试当前使用的图片服务：</p>
+        <img src="https://dummyimage.com/300x200/667eea/ffffff&text=Test+Image" alt="测试图片">
+        <p>如果上方图片正常显示，说明图片服务工作正常。</p>
+    </div>
+
+    <div class="test-item warning">
+        <h3>🖱️ 点击交互测试</h3>
+        <p>正确的交互流程：</p>
+        <ol>
+            <li>搜索并显示结果</li>
+            <li>点击任意结果卡片</li>
+            <li>应该打开详情模态框</li>
+            <li>在模态框中点击"查看原页面"按钮</li>
+            <li>应该在新标签页打开原网站</li>
+        </ol>
+        <p><strong>注意</strong>: 点击卡片不会直接跳转，而是打开详情框，这是正确的设计。</p>
+    </div>
+
+    <div class="test-item info">
+        <h3>📱 响应式测试</h3>
+        <p>在不同设备上测试：</p>
+        <ul>
+            <li>桌面浏览器 - 完整功能</li>
+            <li>平板设备 - 适配布局</li>
+            <li>手机设备 - 移动优化</li>
+        </ul>
+    </div>
+
+    <div class="test-item success">
+        <h3>⚙️ 网站管理测试</h3>
+        <p>测试步骤：</p>
+        <ol>
+            <li>点击右上角的"管理网站"按钮</li>
+            <li>查看预配置的网站列表</li>
+            <li>尝试添加、编辑或禁用网站</li>
+        </ol>
+    </div>
+
+    <div class="test-item info">
+        <h3>🔗 有用的链接</h3>
+        <a href="/" class="btn">主页</a>
+        <a href="https://github.com/你的用户名/find-3d" class="btn">GitHub仓库</a>
+        <a href="/simple.html" class="btn">简单版本</a>
+    </div>
+
+    <div class="test-item">
+        <h3>📋 问题报告</h3>
+        <p>如果发现任何问题，请检查：</p>
+        <ul>
+            <li>浏览器控制台是否有错误信息</li>
+            <li>网络连接是否正常</li>
+            <li>是否需要清除浏览器缓存</li>
+        </ul>
+    </div>
+
+    <script>
+        // 简单的功能测试
+        console.log('🎨 Find 3D 测试页面已加载');
+        
+        // 测试图片加载
+        const testImg = document.querySelector('img');
+        testImg.onload = () => console.log('✅ 测试图片加载成功');
+        testImg.onerror = () => console.log('❌ 测试图片加载失败');
+        
+        // 显示当前时间
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date().toLocaleString('zh-CN');
+            console.log(`测试时间: ${now}`);
+        });
+    </script>
+</body>
+</html>

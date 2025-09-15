@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // 根据部署平台设置base路径
-  base: process.env.NETLIFY ? '/' : (process.env.NODE_ENV === 'production' ? '/find-3d/' : '/'),
+    // GitHub Pages部署配置 - 修复空白页问题
+  base: process.env.NODE_ENV === 'production' ? '/Find-3d/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
