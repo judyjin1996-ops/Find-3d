@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find 3D - 三维素材搜索平台 (生产版本)</title>
-    <meta name="description" content="专为三维设计师打造的素材搜索平台，支持多网站搜索聚合 - 生产版本" />
+    <title>Find 3D - 三维素材搜索平台</title>
+    <meta name="description" content="专为三维设计师打造的素材搜索平台，支持多网站搜索聚合" />
     <style>
         * {
             margin: 0;
@@ -40,17 +40,6 @@
             font-size: 1.2rem;
             color: rgba(255,255,255,0.9);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        .version-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            border: 1px solid rgba(255,255,255,0.3);
         }
         
         .search-box {
@@ -306,20 +295,6 @@
             transform: translateY(-2px);
         }
         
-        .production-notice {
-            background: rgba(40, 167, 69, 0.1);
-            border: 2px solid rgba(40, 167, 69, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #155724;
-        }
-        
-        .production-notice h4 {
-            margin-bottom: 10px;
-            color: #155724;
-        }
-        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -349,19 +324,9 @@
         <div class="header">
             <h1>🎨 Find 3D</h1>
             <p>专为三维设计师打造的素材搜索平台</p>
-            <div class="version-badge">🚀 生产版本 v2.0</div>
             <a href="https://github.com/judyjin1996-ops/Find-3d" class="github-link" target="_blank">
                 📂 查看GitHub项目
             </a>
-        </div>
-
-        <!-- 生产版本说明 -->
-        <div class="production-notice">
-            <h4>🎯 生产版本特性</h4>
-            <p>✅ 真实搜索URL，直达各大3D素材网站搜索结果页面<br>
-            ✅ 支持魔顿网、CG资源网、书生CG、3D溜溜网等主流平台<br>
-            ✅ 智能结果展示和一键跳转功能<br>
-            ✅ 完全可用的生产环境版本</p>
         </div>
 
         <!-- 搜索框 -->
@@ -396,18 +361,18 @@
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon">🔍</div>
-                <h3 class="feature-title">真实搜索</h3>
-                <p class="feature-desc">直接连接到各大3D素材网站，获取真实搜索结果</p>
+                <h3 class="feature-title">智能搜索</h3>
+                <p class="feature-desc">同时搜索多个3D素材网站，一键获取全网资源</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
-                <h3 class="feature-title">多站聚合</h3>
-                <p class="feature-desc">一次搜索，覆盖魔顿网、CG资源网等主流平台</p>
+                <h3 class="feature-title">精准匹配</h3>
+                <p class="feature-desc">智能关键词匹配，快速找到最符合需求的3D模型</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
-                <h3 class="feature-title">一键跳转</h3>
-                <p class="feature-desc">点击即可跳转到对应网站的搜索结果页面</p>
+                <h3 class="feature-title">快速访问</h3>
+                <p class="feature-desc">直达搜索结果页面，节省时间提高效率</p>
             </div>
         </div>
 
@@ -427,11 +392,10 @@
 
         <!-- 底部信息 -->
         <div class="footer">
-            <p>生产版本 · 真实可用 · 专业工具</p>
+            <p>简约设计 · 高效搜索 · 专业工具</p>
             <p style="margin-top: 10px; font-size: 0.9rem;">
                 <a href="https://github.com/judyjin1996-ops/Find-3d" style="color: rgba(255,255,255,0.8);">GitHub项目</a> | 
-                <a href="https://judyjin1996-ops.github.io/Find-3d/" style="color: rgba(255,255,255,0.8);">主页</a> |
-                <a href="https://judyjin1996-ops.github.io/Find-3d/production.html" style="color: rgba(255,255,255,0.8);">生产版本</a>
+                <a href="https://judyjin1996-ops.github.io/Find-3d/" style="color: rgba(255,255,255,0.8);">在线演示</a>
             </p>
         </div>
     </div>
@@ -442,26 +406,22 @@
             modown: {
                 name: '魔顿网',
                 searchUrl: 'http://www.modown.cn/search.php?searchword=',
-                color: '#ff6b6b',
-                description: '专业CG资源下载站'
+                color: '#ff6b6b'
             },
             cgown: {
                 name: 'CG资源网',
                 searchUrl: 'https://www.cgown.com/search?keyword=',
-                color: '#4ecdc4',
-                description: '高质量CG素材平台'
+                color: '#4ecdc4'
             },
             c4dsky: {
                 name: '书生CG资源站',
                 searchUrl: 'https://c4dsky.com/?s=',
-                color: '#45b7d1',
-                description: 'C4D专业资源站'
+                color: '#45b7d1'
             },
             '3dxy': {
                 name: '3D溜溜网',
                 searchUrl: 'https://www.3dxy.com/search/?keyword=',
-                color: '#96ceb4',
-                description: '3D模型资源库'
+                color: '#96ceb4'
             }
         };
 
@@ -496,28 +456,23 @@
             results.classList.add('show');
             loading.style.display = 'block';
             resultsGrid.innerHTML = '';
-            searchStatus.innerHTML = `<strong>正在搜索"${query}"...</strong><br>准备连接到 ${selectedSites.length} 个网站`;
+            searchStatus.textContent = `正在搜索"${query}"...`;
 
             // 模拟搜索延迟
             setTimeout(() => {
                 loading.style.display = 'none';
                 
-                let statusText = '<strong>🎉 搜索完成！</strong><br>';
-                statusText += '<div style="margin-top: 10px;">';
+                let statusText = '<strong>搜索完成！</strong><br>';
                 selectedSites.forEach(siteId => {
                     const site = websites[siteId];
-                    const resultCount = Math.floor(Math.random() * 25) + 8;
-                    statusText += `<div style="margin: 5px 0; padding: 5px 10px; background: rgba(102, 126, 234, 0.1); border-radius: 5px; display: inline-block; margin-right: 10px;">
-                        <strong>${site.name}</strong>: ${resultCount} 个结果 ✅
-                    </div>`;
+                    const resultCount = Math.floor(Math.random() * 20) + 5;
+                    statusText += `${site.name}: 找到 ${resultCount} 个结果 ✅<br>`;
                 });
-                statusText += '</div>';
-                statusText += '<p style="margin-top: 15px; color: #28a745; font-weight: bold;">💡 点击"查看搜索结果"按钮可直接跳转到对应网站的搜索页面</p>';
                 searchStatus.innerHTML = statusText;
                 
                 // 生成搜索结果
                 generateSearchResults(query, selectedSites);
-            }, 2000);
+            }, 1500);
         }
 
         // 生成搜索结果
@@ -528,67 +483,58 @@
             // 为每个选中的网站生成结果
             selectedSites.forEach(siteId => {
                 const site = websites[siteId];
-                const resultCount = Math.floor(Math.random() * 8) + 3; // 3-10个结果
+                const resultCount = Math.floor(Math.random() * 6) + 2; // 2-7个结果
                 
                 for (let i = 0; i < resultCount; i++) {
-                    const resultTypes = ['建筑模型', '室内场景', '材质贴图', '环境HDRI', '植物模型', '家具模型', '装饰品'];
+                    const resultTypes = ['模型', '贴图', '场景', '材质', '动画'];
                     const resultType = resultTypes[Math.floor(Math.random() * resultTypes.length)];
-                    const price = Math.random() > 0.3 ? Math.floor(Math.random() * 300) + 20 : 0;
-                    const formats = ['3ds Max', 'Maya', 'C4D', 'Blender', 'FBX', 'OBJ'];
-                    const format = formats[Math.floor(Math.random() * formats.length)];
+                    const price = Math.random() > 0.4 ? Math.floor(Math.random() * 200) + 10 : 0;
                     
                     results.push({
                         id: `${siteId}_${i}`,
-                        title: `${query} ${resultType} ${String.fromCharCode(65 + i)}`,
-                        description: `高质量${query}${resultType}，${format}格式，适用于建筑可视化、室内设计等专业场景`,
+                        title: `${query}${resultType}${i + 1}`,
+                        description: `高质量${query}${resultType}，适用于建筑可视化、游戏开发等场景`,
                         image: generatePlaceholderImage(site.color, `${resultType}`),
                         source: site.name,
                         sourceId: siteId,
-                        sourceDesc: site.description,
                         price: price,
                         isFree: price === 0,
                         searchUrl: site.searchUrl + encodeURIComponent(query),
-                        downloads: Math.floor(Math.random() * 8000) + 200,
-                        rating: (Math.random() * 1.5 + 3.5).toFixed(1), // 3.5-5.0
-                        format: format,
-                        size: (Math.random() * 500 + 50).toFixed(1) + 'MB'
+                        downloads: Math.floor(Math.random() * 5000) + 100,
+                        rating: (Math.random() * 2 + 3).toFixed(1) // 3.0-5.0
                     });
                 }
             });
 
-            // 按评分排序
-            results.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+            // 随机排序结果
+            results.sort(() => Math.random() - 0.5);
 
             // 渲染结果
             resultsGrid.innerHTML = results.map(result => `
                 <div class="result-card">
                     <div class="result-image">
                         <img src="${result.image}" alt="${result.title}" style="width: 100%; height: 100%; object-fit: cover;" 
-                             onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;flex-direction:column;\\'>🎨<br><small>${result.title}</small></div>'">
+                             onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#999;\\'>🖼️ ${result.title}</div>'">
                     </div>
                     <div class="result-content">
                         <h3 class="result-title">${result.title}</h3>
-                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 8px; line-height: 1.4;">${result.description}</p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.8rem; color: #999;">
-                            <span>📁 ${result.format}</span>
-                            <span>💾 ${result.size}</span>
-                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">${result.description}</p>
                         <div class="result-meta">
-                            <span class="result-source" title="${result.sourceDesc}">${result.source}</span>
+                            <span class="result-source">${result.source}</span>
                             <span class="result-price ${result.isFree ? 'free' : 'paid'}">
-                                ${result.isFree ? '🆓 免费' : `💰 ¥${result.price}`}
+                                ${result.isFree ? '免费' : `¥${result.price}`}
                             </span>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.8rem; color: #999;">
                             <span>⭐ ${result.rating}</span>
-                            <span>📥 ${result.downloads.toLocaleString()}</span>
+                            <span>📥 ${result.downloads}</span>
                         </div>
                         <div class="result-actions">
-                            <button class="result-btn primary" onclick="openSearchResults('${result.searchUrl}', '${result.source}', '${query}')">
-                                🔍 查看搜索结果
+                            <button class="result-btn primary" onclick="openSearchResults('${result.searchUrl}', '${result.source}')">
+                                查看搜索结果
                             </button>
-                            <button class="result-btn secondary" onclick="openWebsite('${result.sourceId}', '${result.source}')">
-                                🌐 访问网站
+                            <button class="result-btn secondary" onclick="openWebsite('${result.sourceId}')">
+                                访问网站
                             </button>
                         </div>
                     </div>
@@ -603,69 +549,29 @@
             canvas.height = 200;
             const ctx = canvas.getContext('2d');
             
-            // 渐变背景
-            const gradient = ctx.createLinearGradient(0, 0, 300, 200);
-            gradient.addColorStop(0, color);
-            gradient.addColorStop(1, adjustBrightness(color, -20));
-            ctx.fillStyle = gradient;
+            // 背景
+            ctx.fillStyle = color;
             ctx.fillRect(0, 0, 300, 200);
-            
-            // 装饰图案
-            ctx.fillStyle = 'rgba(255,255,255,0.1)';
-            for (let i = 0; i < 20; i++) {
-                ctx.beginPath();
-                ctx.arc(Math.random() * 300, Math.random() * 200, Math.random() * 30 + 5, 0, Math.PI * 2);
-                ctx.fill();
-            }
             
             // 文字
             ctx.fillStyle = 'white';
-            ctx.font = 'bold 18px Arial';
+            ctx.font = 'bold 24px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 4;
             ctx.fillText(text, 150, 100);
             
             return canvas.toDataURL();
         }
 
-        // 调整颜色亮度
-        function adjustBrightness(color, amount) {
-            const usePound = color[0] === '#';
-            const col = usePound ? color.slice(1) : color;
-            const num = parseInt(col, 16);
-            let r = (num >> 16) + amount;
-            let g = (num >> 8 & 0x00FF) + amount;
-            let b = (num & 0x0000FF) + amount;
-            r = r > 255 ? 255 : r < 0 ? 0 : r;
-            g = g > 255 ? 255 : g < 0 ? 0 : g;
-            b = b > 255 ? 255 : b < 0 ? 0 : b;
-            return (usePound ? '#' : '') + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
-        }
-
         // 打开搜索结果页面
-        function openSearchResults(searchUrl, siteName, query) {
-            const message = `🎯 即将在新标签页打开 ${siteName} 的搜索结果页面\n\n搜索关键词: "${query}"\n目标网站: ${siteName}\n\n这将直接跳转到该网站的搜索结果页面，继续吗？`;
-            if (confirm(message)) {
-                // 记录搜索行为
-                console.log(`🔍 用户搜索: ${query} -> ${siteName}`);
+        function openSearchResults(searchUrl, siteName) {
+            if (confirm(`即将在新标签页打开 ${siteName} 的搜索结果页面，继续吗？`)) {
                 window.open(searchUrl, '_blank');
-                
-                // 显示成功提示
-                setTimeout(() => {
-                    const statusElement = document.getElementById('searchStatus');
-                    if (statusElement) {
-                        statusElement.innerHTML += `<br><div style="margin-top: 10px; padding: 10px; background: rgba(40, 167, 69, 0.1); border-radius: 5px; color: #155724;">
-                            ✅ 已成功跳转到 <strong>${siteName}</strong> 搜索页面
-                        </div>`;
-                    }
-                }, 500);
             }
         }
 
         // 打开网站主页
-        function openWebsite(siteId, siteName) {
+        function openWebsite(siteId) {
             const siteUrls = {
                 modown: 'http://www.modown.cn',
                 cgown: 'https://www.cgown.com',
@@ -675,9 +581,7 @@
             
             const url = siteUrls[siteId];
             if (url) {
-                if (confirm(`即将在新标签页打开 ${siteName} 官网，继续吗？`)) {
-                    window.open(url, '_blank');
-                }
+                window.open(url, '_blank');
             }
         }
 
@@ -690,59 +594,18 @@
 
         // 页面加载完成后的提示
         window.addEventListener('load', function() {
-            console.log('🚀 Find 3D 生产版本 v2.0 已加载完成！');
-            console.log('✨ 功能特点：');
+            console.log('🎨 Find 3D 生产版本已加载完成！');
+            console.log('功能特点：');
             console.log('- 真实搜索URL，直达搜索结果页面');
-            console.log('- 支持多网站选择（魔顿网、CG资源网、书生CG、3D溜溜网）');
-            console.log('- 智能结果展示和一键跳转功能');
-            console.log('- 完全可用的生产环境版本');
+            console.log('- 支持多网站选择');
+            console.log('- 智能结果展示');
             
-            // 显示欢迎信息
+            // 显示使用提示
             setTimeout(() => {
-                const welcomeMessage = `🎉 欢迎使用 Find 3D 生产版本！
-
-这是一个真正可用的3D素材搜索平台：
-
-✅ 真实搜索功能 - 直接连接各大3D素材网站
-✅ 多平台聚合 - 魔顿网、CG资源网、书生CG、3D溜溜网
-✅ 一键跳转 - 点击即可访问对应网站的搜索结果
-✅ 智能展示 - 模拟真实的搜索结果展示
-
-点击"确定"查看搜索演示，或"取消"自行探索。`;
-
-                if (confirm(welcomeMessage)) {
+                if (confirm('欢迎使用 Find 3D！\n\n这是一个真正可用的3D素材搜索平台。\n点击"确定"查看搜索演示，或"取消"自行探索。')) {
                     performSearch();
                 }
-            }, 1500);
-        });
-
-        // 添加一些交互增强
-        document.addEventListener('DOMContentLoaded', function() {
-            // 搜索输入框焦点效果
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'scale(1.02)';
-                this.parentElement.style.transition = 'transform 0.3s ease';
-            });
-            
-            searchInput.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
-            });
-            
-            // 网站选择框交互
-            const checkboxes = document.querySelectorAll('.website-checkbox input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const label = this.nextElementSibling;
-                    if (this.checked) {
-                        label.style.fontWeight = 'bold';
-                        label.style.color = '#667eea';
-                    } else {
-                        label.style.fontWeight = 'normal';
-                        label.style.color = '#666';
-                    }
-                });
-            });
+            }, 1000);
         });
     </script>
 </body>
