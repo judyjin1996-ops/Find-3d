@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Pages 诊断工具</title>
+    <style>
+        body { font-family: monospace; background: #1e1e1e; color: #00ff00; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .section { background: #2d2d2d; padding: 20px; margin: 20px 0; border-radius: 10px; }
+        .success { color: #00ff00; }
+        .error { color: #ff4444; }
+        .warning { color: #ffaa00; }
+        .info { color: #4488ff; }
+        pre { background: #000; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 GitHub Pages 诊断工具</h1>
+        
+        <div class="section">
+            <h2>📊 基本信息</h2>
+            <p><strong>当前URL:</strong> <span id="currentUrl"></span></p>
+            <p><strong>用户代理:</strong> <span id="userAgent"></span></p>
+            <p><strong>时间:</strong> <span id="currentTime"></span></p>
+            <p><strong>页面加载时间:</strong> <span id="loadTime"></span></p>
+        </div>
+        
+        <div class="section">
+            <h2>🌐 网络测试</h2>
+            <div id="networkTests">正在测试...</div>
+        </div>
+        
+        <div class="section">
+            <h2>📁 文件访问测试</h2>
+            <div id="fileTests">正在测试...</div>
+        </div>
+        
+        <div class="section">
+            <h2>🔗 快速链接</h2>
+            <p><a href="index.html" style="color: #4488ff;">主页面 (index.html)</a></p>
+            <p><a href="simple.html" style="color: #4488ff;">简单测试 (simple.html)</a></p>
+            <p><a href="backup.html" style="color: #4488ff;">备用页面 (backup.html)</a></p>
+            <p><a href="test-page.html" style="color: #4488ff;">测试页面 (test-page.html)</a></p>
+        </div>
+        
+        <div class="section">
+            <h2>💡 解决建议</h2>
+            <div id="suggestions"></div>
+        </div>
+    </div>
+    
+    <script>
+        const startTime = performance.now();
+        
+        // 显示基本信息
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('currentTime').textContent = new Date().toLocaleString('zh-CN');
+        
+        window.addEventListener('load', function() {
+            const loadTime = (performance.now() - startTime).toFixed(2);
+            document.getElementById('loadTime').textContent = loadTime + ' ms';
+            
+            // 网络测试
+            testNetwork();
+            
+            // 文件测试
+            testFiles();
+            
+            // 生成建议
+            generateSuggestions();
+        });
+        
+        function testNetwork() {
+            const tests = [
+                { name: 'GitHub Pages 连接', url: 'https://judyjin1996-ops.github.io/' },
+                { name: '项目根目录', url: 'https://judyjin1996-ops.github.io/Find-3d/' },
+            ];
+            
+            let html = '';
+            tests.forEach(test => {
+                html += '<p class="info">🔄 测试: ' + test.name + '</p>';
+            });
+            
+            document.getElementById('networkTests').innerHTML = html;
+        }
+        
+        function testFiles() {
+            const files = ['index.html', 'simple.html', 'backup.html', 'test-page.html'];
+            let html = '';
+            
+            files.forEach(file => {
+                fetch(file)
+                    .then(response => {
+                        if (response.ok) {
+                            html += '<p class="success">✅ ' + file + ' - 可访问</p>';
+                        } else {
+                            html += '<p class="error">❌ ' + file + ' - 无法访问 (' + response.status + ')</p>';
+                        }
+                        document.getElementById('fileTests').innerHTML = html;
+                    })
+                    .catch(error => {
+                        html += '<p class="error">❌ ' + file + ' - 网络错误</p>';
+                        document.getElementById('fileTests').innerHTML = html;
+                    });
+            });
+        }
+        
+        function generateSuggestions() {
+            let suggestions = '';
+            
+            if (window.location.href.includes('github.io')) {
+                suggestions += '<p class="success">✅ 你正在访问GitHub Pages</p>';
+                suggestions += '<p class="info">💡 如果主页面空白，尝试以下解决方案:</p>';
+                suggestions += '<p>1. 强制刷新页面 (Ctrl+F5 或 Cmd+Shift+R)</p>';
+                suggestions += '<p>2. 清除浏览器缓存</p>';
+                suggestions += '<p>3. 等待5-10分钟让GitHub Pages完全更新</p>';
+                suggestions += '<p>4. 尝试访问备用页面: <a href="backup.html" style="color: #4488ff;">backup.html</a></p>';
+            } else {
+                suggestions += '<p class="warning">⚠️ 你不在GitHub Pages环境中</p>';
+                suggestions += '<p>请访问: https://judyjin1996-ops.github.io/Find-3d/</p>';
+            }
+            
+            document.getElementById('suggestions').innerHTML = suggestions;
+        }
+        
+        console.log('🔧 GitHub Pages诊断工具已加载');
+        console.log('URL:', window.location.href);
+        console.log('时间:', new Date().toLocaleString('zh-CN'));
+    </script>
+</body>
+</html>

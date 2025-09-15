@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 导入响应式样式 */
+@import './styles/responsive.css';
+
+/* 简笔画风格的全局样式 */
+@layer base {
+  body {
+    @apply bg-sketch-background text-sketch-text;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    /* 支持安全区域 */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  
+  * {
+    @apply border-sketch-border;
+  }
+  
+  /* 改善触摸设备的滚动体验 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 改善文本渲染 */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* 简笔画风格的组件样式 */
+@layer components {
+  .sketch-card {
+    @apply bg-sketch-card border-2 border-sketch-border rounded-sketch shadow-sketch;
+    /* 响应式内边距 */
+    @apply p-4 sm:p-6;
+  }
+  
+  .sketch-button {
+    @apply bg-sketch-accent text-white px-4 py-2 rounded-sketch border-2 border-sketch-accent;
+    @apply hover:bg-opacity-90 transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-sketch-accent focus:ring-opacity-50;
+    /* 移动端触摸友好 */
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .sketch-input {
+    @apply border-2 border-sketch-border rounded-sketch px-3 py-2;
+    @apply focus:border-sketch-accent focus:outline-none focus:ring-2 focus:ring-sketch-accent focus:ring-opacity-20;
+    /* 移动端优化 */
+    @apply min-h-[44px] text-base;
+  }
+  
+  .sketch-text-primary {
+    @apply text-sketch-text;
+  }
+  
+  .sketch-text-secondary {
+    @apply text-sketch-muted;
+  }
+  
+  /* 响应式文本大小 */
+  .sketch-heading-1 {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold;
+  }
+  
+  .sketch-heading-2 {
+    @apply text-xl sm:text-2xl lg:text-3xl font-semibold;
+  }
+  
+  .sketch-heading-3 {
+    @apply text-lg sm:text-xl lg:text-2xl font-medium;
+  }
+  
+  /* 响应式间距 */
+  .sketch-spacing-sm {
+    @apply p-2 sm:p-3 lg:p-4;
+  }
+  
+  .sketch-spacing-md {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  .sketch-spacing-lg {
+    @apply p-6 sm:p-8 lg:p-12;
+  }
+  
+  /* 响应式网格 */
+  .sketch-grid {
+    @apply grid gap-4 sm:gap-6 lg:gap-8;
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  /* 移动端优化的模态框 */
+  .sketch-modal-mobile {
+    @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center;
+    @apply p-0 sm:p-4;
+  }
+  
+  .sketch-modal-content-mobile {
+    @apply w-full sm:max-w-lg sm:rounded-sketch;
+    @apply bg-white rounded-t-sketch sm:rounded-sketch;
+    @apply max-h-[90vh] overflow-y-auto;
+  }
+}
+
+/* 动画优化 */
+@layer utilities {
+  /* 尊重用户的动画偏好 */
+  @media (prefers-reduced-motion: reduce) {
+    .respect-motion {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  
+  /* 改善焦点可见性 */
+  .focus-visible-enhanced:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sketch-accent;
+  }
+  
+  /* 触摸设备优化 */
+  @media (hover: none) and (pointer: coarse) {
+    .touch-optimized {
+      @apply min-h-[44px] min-w-[44px];
+    }
+  }
+}

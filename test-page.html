@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试页面 - GitHub Pages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .success {
+            background: #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .info {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 GitHub Pages 测试成功！</h1>
+        
+        <div class="success">
+            <h2>✅ 网站部署正常</h2>
+            <p>如果你能看到这个页面，说明GitHub Pages已经正常工作了！</p>
+        </div>
+        
+        <div class="info">
+            <h3>📋 测试信息</h3>
+            <p><strong>网站地址:</strong> https://judyjin1996-ops.github.io/Find-3d/</p>
+            <p><strong>测试页面:</strong> https://judyjin1996-ops.github.io/Find-3d/test-page.html</p>
+            <p><strong>测试时间:</strong> <span id="currentTime"></span></p>
+        </div>
+        
+        <div class="info">
+            <h3>🔧 下一步操作</h3>
+            <p>1. 确认这个测试页面能正常显示</p>
+            <p>2. 然后访问主页面 index.html</p>
+            <p>3. 如果主页面仍然空白，可能需要等待更长时间</p>
+        </div>
+        
+        <div class="info">
+            <h3>🌐 访问链接</h3>
+            <p><a href="index.html" style="color: #fff; text-decoration: underline;">返回主页面</a></p>
+            <p><a href="https://github.com/judyjin1996-ops/Find-3d" style="color: #fff; text-decoration: underline;">查看GitHub仓库</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // 显示当前时间
+        document.getElementById('currentTime').textContent = new Date().toLocaleString('zh-CN');
+        
+        // 控制台输出
+        console.log('🎉 GitHub Pages测试页面加载成功！');
+        console.log('时间:', new Date().toLocaleString('zh-CN'));
+        console.log('网址:', window.location.href);
+    </script>
+</body>
+</html>

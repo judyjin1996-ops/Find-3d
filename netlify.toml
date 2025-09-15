@@ -1,0 +1,15 @@
+[build]
+  # 使用静态文件部署，不需要构建
+  publish = "dist"
+
+# 单页应用路由配置
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 静态文件缓存配置
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
