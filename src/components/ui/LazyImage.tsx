@@ -105,29 +105,72 @@ export const LazyImage: React.FC<LazyImageProps> = ({
           }
         }
 
-        // 加载图片
-        const response = await fetch(src);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const blob = await response.blob();
+        // 尝试直接使用图片URL（避免CORS问题）
+        const testImage = new Image();
+        testImage.crossOrigin = 'anonymous';
         
-        // 缓存图片
-        if (enableCache) {
-          cacheService.cacheImage(src, blob);
-        }
+        const imageLoadPromise = new Promise<void>((resolve, reject) => {
+          testImage.onload = () => {
+            // 图片可以直接加载，使用原始URL
+            setImageSrc(src);
+            setIsLoading(false);
+            onLoad?.();
+            resolve();
+          };
+          
+          testImage.onerror = () => {
+            // 图片直接加载失败，尝试通过fetch
+            reject(new Error('Direct load failed'));
+          };
+          
+          // 设置超时
+          setTimeout(() => {
+            reject(new Error('Load timeout'));
+          }, 8000);
+        });
+        
+        testImage.src = src;
+        
+        try {
+          await imageLoadPromise;
+        } catch {
+          // 如果直接加载失败，尝试通过fetch（可能有CORS限制）
+          try {
+            const response = await fetch(src, {
+              mode: 'cors',
+              credentials: 'omit'
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
 
-        const url = URL.createObjectURL(blob);
-        setImageSrc(url);
-        setIsLoading(false);
-        onLoad?.();
+            const blob = await response.blob();
+            
+            // 缓存图片
+            if (enableCache) {
+              cacheService.cacheImage(src, blob);
+            }
+
+            const url = URL.createObjectURL(blob);
+            setImageSrc(url);
+            setIsLoading(false);
+            onLoad?.();
+          } catch (fetchError) {
+            // 如果fetch也失败，尝试使用代理或直接显示原URL
+            console.warn('图片fetch失败，尝试直接显示:', src, fetchError);
+            setImageSrc(src); // 直接使用原URL，让浏览器处理
+            setIsLoading(false);
+            // 不调用onError，让图片元素自己处理错误
+          }
+        }
 
       } catch (error) {
         console.warn('图片加载失败:', src, error);
-        setHasError(true);
+        // 最后的备用方案：直接使用原URL
+        setImageSrc(src);
         setIsLoading(false);
-        onError?.();
+        // 不设置hasError，让图片元素自己处理
       }
     };
 

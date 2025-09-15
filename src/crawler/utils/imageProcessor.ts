@@ -205,6 +205,9 @@ export class ImageProcessor {
       return new Promise((resolve, reject) => {
         const img = new Image();
         
+        // 设置跨域属性
+        img.crossOrigin = 'anonymous';
+        
         img.onload = () => {
           resolve({
             width: img.naturalWidth || img.width,
@@ -214,20 +217,39 @@ export class ImageProcessor {
           });
         };
         
-        img.onerror = () => {
-          reject(new Error('图片加载失败'));
+        img.onerror = (error) => {
+          console.warn(`图片加载失败: ${url}`, error);
+          // 即使加载失败，也返回基本信息
+          resolve({
+            width: 300,
+            height: 200,
+            size: 0,
+            format: this.getImageFormat(url)
+          });
         };
         
         // 设置超时
         setTimeout(() => {
-          reject(new Error('图片加载超时'));
-        }, 10000);
+          console.warn(`图片加载超时: ${url}`);
+          resolve({
+            width: 300,
+            height: 200,
+            size: 0,
+            format: this.getImageFormat(url)
+          });
+        }, 5000); // 减少超时时间到5秒
         
         img.src = url;
       });
     } catch (error) {
       console.error('获取图片信息失败:', error);
-      return null;
+      // 返回默认信息而不是null
+      return {
+        width: 300,
+        height: 200,
+        size: 0,
+        format: this.getImageFormat(url)
+      };
     }
   }
 

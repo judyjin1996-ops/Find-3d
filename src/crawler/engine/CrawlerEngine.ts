@@ -257,24 +257,85 @@ export class CrawlerEngine {
    */
   private async extractResultLinks(page: Page, rule: CrawlerRule): Promise<string[]> {
     try {
-      const links = await page.evaluate((selectors) => {
-        const container = document.querySelector(selectors.container);
-        if (!container) return [];
+      const links = await page.evaluate((selectors, baseUrl) => {
+        // 尝试多个容器选择器
+        const containerSelectors = selectors.container.split(',').map(s => s.trim());
+        let container = null;
+        
+        for (const selector of containerSelectors) {
+          container = document.querySelector(selector);
+          if (container) break;
+        }
+        
+        if (!container) {
+          console.log('未找到容器元素，尝试查找所有可能的文章元素');
+          // 如果没找到容器，直接在整个页面查找
+          container = document.body;
+        }
 
-        const items = container.querySelectorAll(selectors.item);
+        // 尝试多个项目选择器
+        const itemSelectors = selectors.item.split(',').map(s => s.trim());
+        let items: NodeListOf<Element> | null = null;
+        
+        for (const selector of itemSelectors) {
+          items = container.querySelectorAll(selector);
+          if (items.length > 0) break;
+        }
+        
+        if (!items || items.length === 0) {
+          console.log('未找到文章项目元素');
+          return [];
+        }
+
         const links: string[] = [];
+        const linkSelectors = selectors.link.split(',').map(s => s.trim());
 
         items.forEach(item => {
-          const linkElement = item.querySelector(selectors.link) as HTMLAnchorElement;
-          if (linkElement && linkElement.href) {
-            links.push(linkElement.href);
+          for (const linkSelector of linkSelectors) {
+            const linkElement = item.querySelector(linkSelector) as HTMLAnchorElement;
+            if (linkElement) {
+              let href = linkElement.href || linkElement.getAttribute('href');
+              
+              if (href) {
+                // 处理相对链接
+                if (href.startsWith('/')) {
+                  href = baseUrl + href;
+                } else if (href.startsWith('./')) {
+                  href = baseUrl + href.substring(1);
+                } else if (!href.startsWith('http')) {
+                  href = baseUrl + '/' + href;
+                }
+                
+                // 只添加指向archives的链接（魔顿网的文章链接格式）
+                if (href.includes('/archives/') || href.includes('archives')) {
+                  links.push(href);
+                  break; // 找到一个有效链接就跳出内层循环
+                }
+              }
+            }
           }
         });
 
+        console.log(`找到 ${links.length} 个有效链接`);
         return links;
-      }, rule.parseConfig.listSelectors);
+      }, rule.parseConfig.listSelectors, rule.baseUrl);
 
-      return links.filter(link => link && link.startsWith('http'));
+      // 过滤和验证链接
+      const validLinks = links.filter(link => {
+        if (!link || !link.startsWith('http')) return false;
+        
+        // 确保是目标网站的链接
+        try {
+          const url = new URL(link);
+          const baseUrl = new URL(rule.baseUrl);
+          return url.hostname === baseUrl.hostname;
+        } catch {
+          return false;
+        }
+      });
+
+      console.log(`✅ 提取到 ${validLinks.length} 个有效链接`);
+      return validLinks.slice(0, 20); // 限制链接数量
     } catch (error) {
       console.error('提取搜索结果链接失败:', error);
       return [];

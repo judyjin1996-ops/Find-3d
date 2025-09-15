@@ -7,6 +7,7 @@ import { CrawlerRule } from '../types/crawler';
 
 /**
  * 魔顿网 (modown.cn) 爬虫规则
+ * 更新后的规则，修复链接提取和数据提取问题
  */
 const modownRule: CrawlerRule = {
   id: 'modown',
@@ -24,29 +25,31 @@ const modownRule: CrawlerRule = {
   
   parseConfig: {
     listSelectors: {
-      container: '.posts-wrapper',
-      item: '.post-item',
-      link: '.post-title a'
+      // 更新搜索结果页面的选择器
+      container: '#main .content, .main-content, .posts, .search-results',
+      item: 'article, .post, .entry, [class*="post-"]',
+      link: 'h2 a, .entry-title a, .post-title a, a[href*="archives"]'
     },
     detailSelectors: {
-      title: '.post-title h1, .entry-title',
-      description: '.post-content .entry-content p:first-of-type',
-      images: '.post-content img, .entry-content img',
-      price: '.price, .download-info .price',
-      freeIndicator: '.free, .免费, [class*="free"]',
+      // 更新详情页面的选择器
+      title: 'h1.entry-title, .post-title h1, .single-title, h1',
+      description: '.entry-content p:first-of-type, .post-content p:first-of-type, .content p:first-of-type',
+      images: '.entry-content img, .post-content img, .wp-post-image, .featured-image img, img[src*="wp-content"]',
+      price: '.download-price, .price-info, .vip-price, [class*="price"]',
+      freeIndicator: '.free-download, .免费下载, .free-tag, [class*="free"]',
       fileInfo: {
-        format: '.file-format, .format',
-        size: '.file-size, .size'
+        format: '.file-type, .format-info, .download-format, [class*="format"]',
+        size: '.file-size, .size-info, .download-size, [class*="size"]'
       },
       stats: {
-        downloads: '.download-count, .downloads',
-        views: '.view-count, .views'
+        downloads: '.download-count, .dl-count, .downloads, [class*="download"]',
+        views: '.view-count, .views, .post-views, [class*="view"]'
       },
       metadata: {
-        author: '.author, .post-author',
-        tags: '.post-tags a, .tags a',
-        category: '.post-category a, .category a',
-        uploadDate: '.post-date, .date'
+        author: '.author-name, .post-author, .by-author, [class*="author"]',
+        tags: '.post-tags a, .tag-links a, .tags a, [rel="tag"]',
+        category: '.post-category a, .cat-links a, .category a',
+        uploadDate: '.post-date, .entry-date, .publish-date, time'
       }
     }
   },
@@ -60,7 +63,7 @@ const modownRule: CrawlerRule = {
     priceExtraction: {
       regex: '([\\d.]+)',
       currency: 'CNY',
-      freeKeywords: ['免费', 'free', '0元', '0.00']
+      freeKeywords: ['免费', 'free', '0元', '0.00', '免费下载', '免费资源', 'Free']
     },
     dateProcessing: {
       format: 'YYYY-MM-DD',
@@ -69,7 +72,7 @@ const modownRule: CrawlerRule = {
     imageProcessing: {
       baseUrl: 'https://www.modown.cn',
       preferredSize: 'medium',
-      fallbackImage: '/assets/default-preview.jpg'
+      fallbackImage: 'https://www.modown.cn/wp-content/themes/modown/images/default-thumb.jpg'
     }
   },
   
@@ -77,23 +80,28 @@ const modownRule: CrawlerRule = {
     useHeadlessBrowser: true,
     browserConfig: {
       viewport: { width: 1920, height: 1080 },
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       enableJavaScript: true,
-      waitForSelector: '.posts-wrapper',
-      waitTime: 2000
+      waitForSelector: '#main, .content, .posts',
+      waitTime: 3000
     },
     requestConfig: {
-      delay: 2000,
+      delay: 3000,
       randomDelay: true,
       maxRetries: 3,
-      timeout: 30000
+      timeout: 45000
+    },
+    proxyConfig: {
+      enabled: false,
+      rotateProxies: false
     }
   },
   
   qualityControl: {
-    minTitleLength: 5,
+    minTitleLength: 3,
     requireImage: false,
     requirePrice: false,
-    maxResultsPerPage: 20,
+    maxResultsPerPage: 15,
     duplicateDetection: true
   },
   

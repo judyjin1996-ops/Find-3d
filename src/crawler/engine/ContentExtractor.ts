@@ -62,117 +62,283 @@ export class ContentExtractor {
       console.log('🔄 回退到传统提取方法...');
       const selectors = rule.parseConfig.detailSelectors;
       
-      const extractedData = await page.evaluate((selectors, processing) => {
+      const extractedData = await page.evaluate((selectors, processing, baseUrl) => {
         const data: any = {};
 
-        // 提取标题
+        // 提取标题 - 尝试多个选择器
         if (selectors.title) {
-          const titleElement = document.querySelector(selectors.title);
-          if (titleElement) {
-            data.title = titleElement.textContent?.trim();
+          const titleSelectors = selectors.title.split(',').map(s => s.trim());
+          for (const selector of titleSelectors) {
+            const titleElement = document.querySelector(selector);
+            if (titleElement && titleElement.textContent?.trim()) {
+              data.title = titleElement.textContent.trim();
+              break;
+            }
           }
         }
 
-        // 提取描述
+        // 提取描述 - 尝试多个选择器
         if (selectors.description) {
-          const descElement = document.querySelector(selectors.description);
-          if (descElement) {
-            data.description = descElement.textContent?.trim();
+          const descSelectors = selectors.description.split(',').map(s => s.trim());
+          for (const selector of descSelectors) {
+            const descElement = document.querySelector(selector);
+            if (descElement && descElement.textContent?.trim()) {
+              data.description = descElement.textContent.trim();
+              break;
+            }
           }
         }
 
-        // 提取图片
+        // 提取图片 - 改进的图片提取逻辑
         if (selectors.images) {
-          const imageElements = document.querySelectorAll(selectors.images);
-          data.images = Array.from(imageElements).map((img: any) => ({
-            url: img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy'),
-            alt: img.alt || '',
-            size: 'medium' as const
-          })).filter(img => img.url);
+          const imageSelectors = selectors.images.split(',').map(s => s.trim());
+          const allImages: any[] = [];
+          
+          for (const selector of imageSelectors) {
+            const imageElements = document.querySelectorAll(selector);
+            Array.from(imageElements).forEach((img: any) => {
+              let imageUrl = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy') || img.getAttribute('data-original');
+              
+              if (imageUrl) {
+                // 处理相对URL
+                if (imageUrl.startsWith('/')) {
+                  imageUrl = baseUrl + imageUrl;
+                } else if (imageUrl.startsWith('./')) {
+                  imageUrl = baseUrl + imageUrl.substring(1);
+                } else if (!imageUrl.startsWith('http')) {
+                  imageUrl = baseUrl + '/' + imageUrl;
+                }
+                
+                // 过滤掉明显不是预览图的图片
+                const isValidPreview = !imageUrl.includes('avatar') && 
+                                     !imageUrl.includes('icon') && 
+                                     !imageUrl.includes('logo') &&
+                                     !imageUrl.includes('emoji') &&
+                                     (imageUrl.includes('wp-content') || 
+                                      imageUrl.includes('upload') || 
+                                      imageUrl.includes('image') ||
+                                      imageUrl.includes('thumb'));
+                
+                if (isValidPreview) {
+                  allImages.push({
+                    url: imageUrl,
+                    alt: img.alt || '',
+                    size: 'medium' as const
+                  });
+                }
+              }
+            });
+          }
+          
+          // 去重并限制数量
+          const uniqueImages = allImages.filter((img, index, self) => 
+            index === self.findIndex(i => i.url === img.url)
+          );
+          
+          data.images = uniqueImages.slice(0, 5); // 最多5张图片
         }
 
-        // 提取价格信息
+        // 提取价格信息 - 改进的价格提取
         if (selectors.price) {
-          const priceElement = document.querySelector(selectors.price);
-          if (priceElement) {
-            data.priceText = priceElement.textContent?.trim();
+          const priceSelectors = selectors.price.split(',').map(s => s.trim());
+          for (const selector of priceSelectors) {
+            const priceElement = document.querySelector(selector);
+            if (priceElement && priceElement.textContent?.trim()) {
+              data.priceText = priceElement.textContent.trim();
+              break;
+            }
           }
         }
 
-        // 检查免费标识
+        // 检查免费标识 - 多种方式检测免费内容
+        data.isFree = false;
+        
+        // 1. 通过专门的免费标识元素
         if (selectors.freeIndicator) {
-          const freeElement = document.querySelector(selectors.freeIndicator);
-          data.isFree = !!freeElement;
+          const freeSelectors = selectors.freeIndicator.split(',').map(s => s.trim());
+          for (const selector of freeSelectors) {
+            const freeElement = document.querySelector(selector);
+            if (freeElement) {
+              data.isFree = true;
+              break;
+            }
+          }
+        }
+        
+        // 2. 通过价格文本判断
+        if (!data.isFree && data.priceText) {
+          const freeKeywords = ['免费', 'free', '0元', '0.00', '免费下载'];
+          data.isFree = freeKeywords.some(keyword => 
+            data.priceText.toLowerCase().includes(keyword.toLowerCase())
+          );
+        }
+        
+        // 3. 通过页面内容判断
+        if (!data.isFree) {
+          const pageText = document.body.textContent || '';
+          const freeIndicators = ['免费下载', '免费资源', 'free download'];
+          data.isFree = freeIndicators.some(indicator => 
+            pageText.toLowerCase().includes(indicator.toLowerCase())
+          );
         }
 
-        // 提取文件信息
+        // 提取文件信息 - 改进的文件信息提取
         if (selectors.fileInfo?.format) {
-          const formatElement = document.querySelector(selectors.fileInfo.format);
-          if (formatElement) {
-            data.fileFormat = formatElement.textContent?.trim();
+          const formatSelectors = selectors.fileInfo.format.split(',').map(s => s.trim());
+          for (const selector of formatSelectors) {
+            const formatElement = document.querySelector(selector);
+            if (formatElement && formatElement.textContent?.trim()) {
+              data.fileFormat = formatElement.textContent.trim();
+              break;
+            }
           }
         }
 
         if (selectors.fileInfo?.size) {
-          const sizeElement = document.querySelector(selectors.fileInfo.size);
-          if (sizeElement) {
-            data.fileSize = sizeElement.textContent?.trim();
+          const sizeSelectors = selectors.fileInfo.size.split(',').map(s => s.trim());
+          for (const selector of sizeSelectors) {
+            const sizeElement = document.querySelector(selector);
+            if (sizeElement && sizeElement.textContent?.trim()) {
+              data.fileSize = sizeElement.textContent.trim();
+              break;
+            }
           }
         }
 
-        // 提取统计信息
+        // 如果没有找到明确的文件信息，尝试从页面内容中提取
+        if (!data.fileFormat || !data.fileSize) {
+          const contentText = document.body.textContent || '';
+          
+          // 提取文件格式
+          if (!data.fileFormat) {
+            const formatMatch = contentText.match(/格式[：:]\s*([A-Za-z0-9]+)|文件格式[：:]\s*([A-Za-z0-9]+)|\.([A-Za-z0-9]{2,4})\s*文件/i);
+            if (formatMatch) {
+              data.fileFormat = (formatMatch[1] || formatMatch[2] || formatMatch[3]).toUpperCase();
+            }
+          }
+          
+          // 提取文件大小
+          if (!data.fileSize) {
+            const sizeMatch = contentText.match(/大小[：:]\s*([\d.]+\s*[KMGT]?B)|文件大小[：:]\s*([\d.]+\s*[KMGT]?B)|([\d.]+\s*[KMGT]B)/i);
+            if (sizeMatch) {
+              data.fileSize = (sizeMatch[1] || sizeMatch[2] || sizeMatch[3]).trim();
+            }
+          }
+        }
+
+        // 提取统计信息 - 改进的统计信息提取
         if (selectors.stats?.downloads) {
-          const downloadsElement = document.querySelector(selectors.stats.downloads);
-          if (downloadsElement) {
-            const downloadsText = downloadsElement.textContent?.trim();
-            data.downloadCount = this.extractNumber(downloadsText);
+          const downloadSelectors = selectors.stats.downloads.split(',').map(s => s.trim());
+          for (const selector of downloadSelectors) {
+            const downloadsElement = document.querySelector(selector);
+            if (downloadsElement) {
+              const downloadsText = downloadsElement.textContent?.trim();
+              const count = extractNumber(downloadsText);
+              if (count !== undefined) {
+                data.downloadCount = count;
+                break;
+              }
+            }
           }
         }
 
         if (selectors.stats?.views) {
-          const viewsElement = document.querySelector(selectors.stats.views);
-          if (viewsElement) {
-            const viewsText = viewsElement.textContent?.trim();
-            data.viewCount = this.extractNumber(viewsText);
+          const viewSelectors = selectors.stats.views.split(',').map(s => s.trim());
+          for (const selector of viewSelectors) {
+            const viewsElement = document.querySelector(selector);
+            if (viewsElement) {
+              const viewsText = viewsElement.textContent?.trim();
+              const count = extractNumber(viewsText);
+              if (count !== undefined) {
+                data.viewCount = count;
+                break;
+              }
+            }
           }
         }
 
         if (selectors.stats?.rating) {
-          const ratingElement = document.querySelector(selectors.stats.rating);
-          if (ratingElement) {
-            const ratingText = ratingElement.textContent?.trim();
-            data.rating = this.extractRating(ratingText);
+          const ratingSelectors = selectors.stats.rating.split(',').map(s => s.trim());
+          for (const selector of ratingSelectors) {
+            const ratingElement = document.querySelector(selector);
+            if (ratingElement) {
+              const ratingText = ratingElement.textContent?.trim();
+              const rating = extractRating(ratingText);
+              if (rating !== undefined) {
+                data.rating = rating;
+                break;
+              }
+            }
           }
         }
 
-        // 提取元数据
+        // 如果没有找到明确的统计信息，尝试从页面内容中提取
+        if (data.downloadCount === undefined || data.viewCount === undefined) {
+          const contentText = document.body.textContent || '';
+          
+          if (data.downloadCount === undefined) {
+            const downloadMatch = contentText.match(/下载[：:]?\s*([\d,]+)|下载次数[：:]?\s*([\d,]+)|已下载\s*([\d,]+)/i);
+            if (downloadMatch) {
+              data.downloadCount = extractNumber(downloadMatch[1] || downloadMatch[2] || downloadMatch[3]);
+            }
+          }
+          
+          if (data.viewCount === undefined) {
+            const viewMatch = contentText.match(/浏览[：:]?\s*([\d,]+)|查看次数[：:]?\s*([\d,]+)|已浏览\s*([\d,]+)/i);
+            if (viewMatch) {
+              data.viewCount = extractNumber(viewMatch[1] || viewMatch[2] || viewMatch[3]);
+            }
+          }
+        }
+
+        // 提取元数据 - 改进的元数据提取
         if (selectors.metadata?.author) {
-          const authorElement = document.querySelector(selectors.metadata.author);
-          if (authorElement) {
-            data.author = authorElement.textContent?.trim();
+          const authorSelectors = selectors.metadata.author.split(',').map(s => s.trim());
+          for (const selector of authorSelectors) {
+            const authorElement = document.querySelector(selector);
+            if (authorElement && authorElement.textContent?.trim()) {
+              data.author = authorElement.textContent.trim();
+              break;
+            }
           }
         }
 
         if (selectors.metadata?.tags) {
-          const tagsElements = document.querySelectorAll(selectors.metadata.tags);
-          data.tags = Array.from(tagsElements).map((tag: any) => 
-            tag.textContent?.trim()
-          ).filter(Boolean);
+          const tagSelectors = selectors.metadata.tags.split(',').map(s => s.trim());
+          const allTags: string[] = [];
+          
+          for (const selector of tagSelectors) {
+            const tagsElements = document.querySelectorAll(selector);
+            Array.from(tagsElements).forEach((tag: any) => {
+              const tagText = tag.textContent?.trim();
+              if (tagText && !allTags.includes(tagText)) {
+                allTags.push(tagText);
+              }
+            });
+          }
+          
+          data.tags = allTags.slice(0, 10); // 限制标签数量
         }
 
         if (selectors.metadata?.category) {
-          const categoryElement = document.querySelector(selectors.metadata.category);
-          if (categoryElement) {
-            data.category = categoryElement.textContent?.trim();
+          const categorySelectors = selectors.metadata.category.split(',').map(s => s.trim());
+          for (const selector of categorySelectors) {
+            const categoryElement = document.querySelector(selector);
+            if (categoryElement && categoryElement.textContent?.trim()) {
+              data.category = categoryElement.textContent.trim();
+              break;
+            }
           }
         }
 
         // 辅助函数：提取数字
         function extractNumber(text: string | undefined): number | undefined {
           if (!text) return undefined;
-          const match = text.match(/[\d,]+/);
+          // 匹配数字，支持逗号分隔符
+          const match = text.match(/([\d,]+)/);
           if (match) {
-            return parseInt(match[0].replace(/,/g, ''), 10);
+            const num = parseInt(match[1].replace(/,/g, ''), 10);
+            return isNaN(num) ? undefined : num;
           }
           return undefined;
         }
@@ -180,15 +346,17 @@ export class ContentExtractor {
         // 辅助函数：提取评分
         function extractRating(text: string | undefined): number | undefined {
           if (!text) return undefined;
-          const match = text.match(/[\d.]+/);
+          // 匹配小数评分
+          const match = text.match(/([\d.]+)/);
           if (match) {
-            return parseFloat(match[0]);
+            const rating = parseFloat(match[1]);
+            return isNaN(rating) ? undefined : Math.min(rating, 5); // 限制最大评分为5
           }
           return undefined;
         }
 
         return data;
-      }, selectors, rule.dataProcessing);
+      }, selectors, rule.dataProcessing, rule.baseUrl);
 
       // 后处理数据
       const processedData = this.postProcessData(extractedData, rule);

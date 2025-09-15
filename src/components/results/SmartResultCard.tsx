@@ -246,15 +246,30 @@ export const SmartResultCard: React.FC<SmartResultCardProps> = ({
                 onLoad={handleImageLoad}
                 enableCache={true}
                 errorComponent={
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Icon name="eye-off" size="sm" className="text-sketch-muted opacity-50" />
+                  <div className="w-full h-full flex items-center justify-center bg-sketch-background">
+                    <div className="text-center text-sketch-muted">
+                      <Icon name="image" size="sm" className="opacity-50 mb-1" />
+                      <div className="text-xs">预览图</div>
+                    </div>
+                  </div>
+                }
+                loadingComponent={
+                  <div className="w-full h-full flex items-center justify-center bg-sketch-background">
+                    <div className="text-center text-sketch-muted">
+                      <div className="animate-pulse">
+                        <Icon name="image" size="sm" className="opacity-30" />
+                      </div>
+                    </div>
                   </div>
                 }
                 className="rounded-sketch"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Icon name="image" size="sm" className="text-sketch-muted opacity-50" />
+              <div className="w-full h-full flex items-center justify-center bg-sketch-background">
+                <div className="text-center text-sketch-muted">
+                  <Icon name="image" size="sm" className="opacity-50 mb-1" />
+                  <div className="text-xs">暂无图片</div>
+                </div>
               </div>
             )}
             

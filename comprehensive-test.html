@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find 3D - 爬虫修复测试页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .result-card {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+        }
+        .result-image {
+            width: 100px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+            float: left;
+        }
+        .result-content {
+            overflow: hidden;
+        }
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .result-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .result-price {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Find 3D - 爬虫修复测试</h1>
+            <p>测试搜索结果链接和预览图显示修复效果</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 搜索功能测试</h2>
+            <p>测试关键词搜索，验证链接正确性和图片显示效果</p>
+            
+            <div>
+                <input type="text" id="searchInput" placeholder="输入搜索关键词（如：手机）" 
+                       style="padding: 8px; width: 200px; margin-right: 10px;">
+                <button class="test-button" onclick="testSearch()">开始搜索测试</button>
+                <button class="test-button" onclick="testSpecificUrl()">测试特定URL</button>
+                <button class="test-button" onclick="clearResults()">清除结果</button>
+            </div>
+
+            <div id="searchProgress" style="display: none;">
+                <div class="loading">
+                    <p>🔄 正在搜索中...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <p id="progressText">准备中...</p>
+                </div>
+            </div>
+
+            <div id="searchResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 测试统计</h2>
+            <div class="stats" id="testStats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalResults">0</div>
+                    <div class="stat-label">总结果数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="validLinks">0</div>
+                    <div class="stat-label">有效链接</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="validImages">0</div>
+                    <div class="stat-label">有效图片</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="qualityScore">0%</div>
+                    <div class="stat-label">质量评分</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔗 链接测试</h2>
+            <p>测试特定的魔顿网链接格式</p>
+            
+            <div>
+                <input type="text" id="urlInput" 
+                       placeholder="输入测试URL（如：http://www.modown.cn/archives/103007.html）"
+                       style="padding: 8px; width: 400px; margin-right: 10px;"
+                       value="http://www.modown.cn/archives/103007.html">
+                <button class="test-button" onclick="testUrlAccess()">测试链接访问</button>
+            </div>
+
+            <div id="urlTestResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🖼️ 图片测试</h2>
+            <p>测试图片加载和显示效果</p>
+            
+            <div>
+                <button class="test-button" onclick="testImageLoading()">测试图片加载</button>
+                <button class="test-button" onclick="testImageFormats()">测试图片格式</button>
+            </div>
+
+            <div id="imageTestResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟爬虫服务（实际应用中会调用真实的API）
+        class MockCrawlerService {
+            async searchMaterials(query, options = {}) {
+                console.log(`🔍 模拟搜索: ${query}`);
+                
+                // 模拟搜索延迟
+                await this.delay(1000);
+                
+                // 返回模拟的搜索结果
+                return {
+                    taskId: 'mock_task_' + Date.now(),
+                    status: 'started',
+                    progress: { total: 1, completed: 0, failed: 0 },
+                    websiteStatus: {},
+                    estimatedTime: 30
+                };
+            }
+
+            async getSearchTaskStatus(taskId) {
+                // 模拟任务进度
+                await this.delay(2000);
+                
+                return {
+                    id: taskId,
+                    status: 'completed',
+                    progress: { total: 1, completed: 1, failed: 0 },
+                    results: this.generateMockResults(),
+                    errors: []
+                };
+            }
+
+            generateMockResults() {
+                return [
+                    {
+                        id: 'result_1',
+                        title: '高质量手机3D模型素材包',
+                        description: '包含多种手机型号的高精度3D模型，适用于产品展示和渲染',
+                        sourceUrl: 'http://www.modown.cn/archives/103007.html',
+                        sourceWebsite: '魔顿网',
+                        previewImages: [
+                            {
+                                url: 'https://via.placeholder.com/300x200/007bff/ffffff?text=手机模型1',
+                                alt: '手机3D模型预览',
+                                size: 'medium'
+                            },
+                            {
+                                url: 'https://via.placeholder.com/300x200/28a745/ffffff?text=手机模型2',
+                                alt: '手机3D模型预览2',
+                                size: 'medium'
+                            }
+                        ],
+                        pricing: {
+                            isFree: true,
+                            price: 0,
+                            currency: 'CNY'
+                        },
+                        fileInfo: {
+                            format: '3DS',
+                            size: '15.6MB'
+                        },
+                        statistics: {
+                            downloadCount: 1250,
+                            viewCount: 5680,
+                            rating: 4.5
+                        },
+                        categorization: {
+                            category: '电子产品',
+                            tags: ['手机', '3D模型', '产品设计', '渲染']
+                        },
+                        quality: {
+                            score: 85
+                        }
+                    },
+                    {
+                        id: 'result_2',
+                        title: 'iPhone 14 Pro Max 精确模型',
+                        description: '基于真实尺寸制作的iPhone 14 Pro Max 3D模型',
+                        sourceUrl: 'http://www.modown.cn/archives/103008.html',
+                        sourceWebsite: '魔顿网',
+                        previewImages: [
+                            {
+                                url: 'https://via.placeholder.com/300x200/dc3545/ffffff?text=iPhone+14',
+                                alt: 'iPhone 14 Pro Max模型',
+                                size: 'medium'
+                            }
+                        ],
+                        pricing: {
+                            isFree: false,
+                            price: 25.00,
+                            currency: 'CNY'
+                        },
+                        fileInfo: {
+                            format: 'OBJ',
+                            size: '8.2MB'
+                        },
+                        statistics: {
+                            downloadCount: 890,
+                            viewCount: 3240,
+                            rating: 4.8
+                        },
+                        categorization: {
+                            category: '电子产品',
+                            tags: ['iPhone', 'Apple', '手机', '精确模型']
+                        },
+                        quality: {
+                            score: 92
+                        }
+                    }
+                ];
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        const mockCrawler = new MockCrawlerService();
+        let currentResults = [];
+
+        async function testSearch() {
+            const query = document.getElementById('searchInput').value || '手机';
+            const progressDiv = document.getElementById('searchProgress');
+            const resultsDiv = document.getElementById('searchResults');
+            
+            // 显示进度
+            progressDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+            
+            try {
+                // 开始搜索
+                updateProgress(0, '初始化搜索...');
+                const searchResponse = await mockCrawler.searchMaterials(query);
+                
+                updateProgress(30, '正在爬取数据...');
+                
+                // 获取结果
+                const task = await mockCrawler.getSearchTaskStatus(searchResponse.taskId);
+                
+                updateProgress(100, '搜索完成！');
+                
+                // 隐藏进度，显示结果
+                setTimeout(() => {
+                    progressDiv.style.display = 'none';
+                    displayResults(task.results);
+                    updateStats(task.results);
+                }, 500);
+                
+            } catch (error) {
+                progressDiv.style.display = 'none';
+                resultsDiv.innerHTML = `<div class="results error">❌ 搜索失败: ${error.message}</div>`;
+            }
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        function displayResults(results) {
+            currentResults = results;
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="results warning">⚠️ 没有找到搜索结果</div>';
+                return;
+            }
+
+            let html = `<div class="results success">✅ 找到 ${results.length} 个结果</div>`;
+            
+            results.forEach((result, index) => {
+                const imageHtml = result.previewImages && result.previewImages.length > 0 
+                    ? `<img src="${result.previewImages[0].url}" alt="${result.previewImages[0].alt}" class="result-image" onerror="this.src='https://via.placeholder.com/100x80/cccccc/666666?text=无图片'">`
+                    : '<div class="result-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">无图片</div>';
+                
+                const priceHtml = result.pricing.isFree 
+                    ? '<span style="color: #28a745;">免费</span>'
+                    : `<span style="color: #007bff;">¥${result.pricing.price}</span>`;
+
+                html += `
+                    <div class="result-card">
+                        ${imageHtml}
+                        <div class="result-content">
+                            <div class="result-title">${result.title}</div>
+                            <div class="result-meta">
+                                🔗 <a href="${result.sourceUrl}" target="_blank" onclick="testLinkClick('${result.sourceUrl}')">${result.sourceUrl}</a>
+                            </div>
+                            <div class="result-meta">
+                                📁 ${result.fileInfo.format || '未知'} | 📏 ${result.fileInfo.size || '未知'} | 
+                                📥 ${result.statistics.downloadCount || 0} 下载 | 
+                                ⭐ ${result.statistics.rating || 0}/5
+                            </div>
+                            <div class="result-price">价格: ${priceHtml}</div>
+                            <div style="margin-top: 10px;">
+                                <button class="test-button" onclick="testResultLink('${result.sourceUrl}')">测试链接</button>
+                                <button class="test-button" onclick="testResultImages(${index})">测试图片</button>
+                                <span style="margin-left: 10px; color: #666;">质量评分: ${result.quality.score}/100</span>
+                            </div>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function updateStats(results) {
+            const totalResults = results.length;
+            let validLinks = 0;
+            let validImages = 0;
+            let totalQuality = 0;
+
+            results.forEach(result => {
+                // 检查链接有效性
+                if (result.sourceUrl && result.sourceUrl.includes('archives')) {
+                    validLinks++;
+                }
+                
+                // 检查图片有效性
+                if (result.previewImages && result.previewImages.length > 0) {
+                    validImages++;
+                }
+                
+                totalQuality += result.quality.score || 0;
+            });
+
+            const avgQuality = totalResults > 0 ? Math.round(totalQuality / totalResults) : 0;
+
+            document.getElementById('totalResults').textContent = totalResults;
+            document.getElementById('validLinks').textContent = validLinks;
+            document.getElementById('validImages').textContent = validImages;
+            document.getElementById('qualityScore').textContent = avgQuality + '%';
+        }
+
+        function testResultLink(url) {
+            const resultsDiv = document.getElementById('urlTestResults');
+            resultsDiv.innerHTML = `<div class="results">🔄 正在测试链接: ${url}</div>`;
+            
+            // 模拟链接测试
+            setTimeout(() => {
+                const isValid = url.includes('archives') && url.includes('modown.cn');
+                const resultClass = isValid ? 'success' : 'error';
+                const resultIcon = isValid ? '✅' : '❌';
+                
+                resultsDiv.innerHTML = `
+                    <div class="results ${resultClass}">
+                        ${resultIcon} 链接测试结果: ${isValid ? '链接格式正确，符合预期' : '链接格式异常'}
+                        <br>URL: ${url}
+                        <br>格式检查: ${url.includes('archives') ? '✅ 包含archives路径' : '❌ 缺少archives路径'}
+                        <br>域名检查: ${url.includes('modown.cn') ? '✅ 正确的域名' : '❌ 域名不匹配'}
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        function testResultImages(index) {
+            const result = currentResults[index];
+            const resultsDiv = document.getElementById('imageTestResults');
+            
+            if (!result.previewImages || result.previewImages.length === 0) {
+                resultsDiv.innerHTML = '<div class="results error">❌ 该结果没有预览图</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="results">🔄 正在测试图片加载...</div>';
+            
+            let html = '<div class="results success">✅ 图片测试结果:</div>';
+            
+            result.previewImages.forEach((img, imgIndex) => {
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <p><strong>图片 ${imgIndex + 1}:</strong> ${img.url}</p>
+                        <img src="${img.url}" alt="${img.alt}" style="max-width: 200px; max-height: 150px; border: 1px solid #ccc;" 
+                             onload="this.nextElementSibling.innerHTML='✅ 加载成功'" 
+                             onerror="this.nextElementSibling.innerHTML='❌ 加载失败'">
+                        <div style="margin-top: 5px; font-size: 12px;">🔄 加载中...</div>
+                    </div>
+                `;
+            });
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = html;
+            }, 500);
+        }
+
+        function testSpecificUrl() {
+            const url = 'http://www.modown.cn/archives/103007.html';
+            document.getElementById('urlInput').value = url;
+            testUrlAccess();
+        }
+
+        function testUrlAccess() {
+            const url = document.getElementById('urlInput').value;
+            const resultsDiv = document.getElementById('urlTestResults');
+            
+            if (!url) {
+                resultsDiv.innerHTML = '<div class="results error">❌ 请输入测试URL</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = `<div class="results">🔄 正在测试URL访问: ${url}</div>`;
+            
+            // 模拟URL访问测试
+            setTimeout(() => {
+                const isValidFormat = url.includes('modown.cn') && url.includes('archives');
+                const isHttps = url.startsWith('https://') || url.startsWith('http://');
+                
+                let resultClass = 'success';
+                let resultIcon = '✅';
+                let message = 'URL格式正确，应该可以正常访问';
+                
+                if (!isValidFormat) {
+                    resultClass = 'error';
+                    resultIcon = '❌';
+                    message = 'URL格式不符合魔顿网archives页面格式';
+                } else if (!isHttps) {
+                    resultClass = 'warning';
+                    resultIcon = '⚠️';
+                    message = 'URL缺少协议前缀';
+                }
+                
+                resultsDiv.innerHTML = `
+                    <div class="results ${resultClass}">
+                        ${resultIcon} ${message}
+                        <br><br>
+                        <strong>详细检查:</strong><br>
+                        • 协议检查: ${isHttps ? '✅ 有效' : '❌ 缺少http/https'}<br>
+                        • 域名检查: ${url.includes('modown.cn') ? '✅ 正确域名' : '❌ 域名不匹配'}<br>
+                        • 路径检查: ${url.includes('archives') ? '✅ 包含archives路径' : '❌ 缺少archives路径'}<br>
+                        • 格式检查: ${url.match(/archives\/\d+\.html/) ? '✅ 符合预期格式' : '❌ 格式不标准'}<br>
+                        <br>
+                        <button class="test-button" onclick="window.open('${url}', '_blank')">在新窗口打开测试</button>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        function testImageLoading() {
+            const resultsDiv = document.getElementById('imageTestResults');
+            resultsDiv.innerHTML = '<div class="results">🔄 正在测试图片加载功能...</div>';
+            
+            const testImages = [
+                'https://via.placeholder.com/300x200/007bff/ffffff?text=测试图片1',
+                'https://via.placeholder.com/300x200/28a745/ffffff?text=测试图片2',
+                'https://invalid-url-test.jpg', // 故意的无效URL
+                'https://via.placeholder.com/300x200/dc3545/ffffff?text=测试图片3'
+            ];
+            
+            let html = '<div class="results success">✅ 图片加载测试:</div>';
+            
+            testImages.forEach((url, index) => {
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <p><strong>测试图片 ${index + 1}:</strong></p>
+                        <img src="${url}" alt="测试图片${index + 1}" style="max-width: 150px; max-height: 100px; border: 1px solid #ccc;" 
+                             onload="this.nextElementSibling.innerHTML='✅ 加载成功'" 
+                             onerror="this.nextElementSibling.innerHTML='❌ 加载失败 - 这是预期的测试结果'">
+                        <div style="margin-top: 5px; font-size: 12px; color: #666;">🔄 加载中...</div>
+                    </div>
+                `;
+            });
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = html;
+            }, 500);
+        }
+
+        function testImageFormats() {
+            const resultsDiv = document.getElementById('imageTestResults');
+            resultsDiv.innerHTML = '<div class="results">🔄 正在测试不同图片格式...</div>';
+            
+            const formatTests = [
+                { format: 'JPEG', url: 'https://via.placeholder.com/200x150.jpg?text=JPEG' },
+                { format: 'PNG', url: 'https://via.placeholder.com/200x150.png?text=PNG' },
+                { format: 'WebP', url: 'https://via.placeholder.com/200x150.webp?text=WebP' },
+                { format: 'SVG', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzAwN2JmZiIvPjx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5TVkc8L3RleHQ+PC9zdmc+' }
+            ];
+            
+            let html = '<div class="results success">✅ 图片格式支持测试:</div>';
+            
+            formatTests.forEach((test, index) => {
+                html += `
+                    <div style="display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                        <p><strong>${test.format}</strong></p>
+                        <img src="${test.url}" alt="${test.format}测试" style="width: 100px; height: 75px; border: 1px solid #ccc;" 
+                             onload="this.nextElementSibling.innerHTML='✅ 支持'" 
+                             onerror="this.nextElementSibling.innerHTML='❌ 不支持'">
+                        <div style="margin-top: 5px; font-size: 12px;">🔄 测试中...</div>
+                    </div>
+                `;
+            });
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = html;
+            }, 500);
+        }
+
+        function testLinkClick(url) {
+            console.log('🔗 用户点击链接:', url);
+            // 这里可以添加链接点击统计
+        }
+
+        function clearResults() {
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('urlTestResults').innerHTML = '';
+            document.getElementById('imageTestResults').innerHTML = '';
+            document.getElementById('searchProgress').style.display = 'none';
+            
+            // 重置统计
+            document.getElementById('totalResults').textContent = '0';
+            document.getElementById('validLinks').textContent = '0';
+            document.getElementById('validImages').textContent = '0';
+            document.getElementById('qualityScore').textContent = '0%';
+            
+            currentResults = [];
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Find 3D 测试页面已加载');
+            
+            // 添加回车键搜索支持
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testSearch();
+                }
+            });
+            
+            document.getElementById('urlInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testUrlAccess();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
