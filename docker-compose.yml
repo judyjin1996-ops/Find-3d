@@ -1,0 +1,165 @@
+# Find3D Material Search - Docker Compose 配置
+# 用于本地开发和测试环境
+
+version: '3.8'
+
+services:
+  # 前端应用
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:3000/api}
+        - VITE_CDN_BASE_URL=${VITE_CDN_BASE_URL:-}
+        - VITE_APP_VERSION=${VITE_APP_VERSION:-1.0.0}
+        - VITE_BUILD_TIME=${VITE_BUILD_TIME}
+        - VITE_COMMIT_HASH=${VITE_COMMIT_HASH}
+        - VITE_BRANCH=${VITE_BRANCH:-main}
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=${API_BASE_URL:-http://api:3000}
+      - CDN_BASE_URL=${CDN_BASE_URL:-}
+      - ENABLE_ANALYTICS=${ENABLE_ANALYTICS:-true}
+      - ENABLE_ERROR_TRACKING=${ENABLE_ERROR_TRACKING:-true}
+      - DEBUG=${DEBUG:-false}
+    volumes:
+      - ./logs:/var/log/nginx
+    networks:
+      - find3d-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./docker/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - find3d-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 后端API服务 (可选，如果需要)
+  api:
+    image: node:18-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+    volumes:
+      - ./api:/app
+      - api-node-modules:/app/node_modules
+    networks:
+      - find3d-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+    command: sh -c "npm install && npm start"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx 负载均衡器 (生产环境)
+  nginx-lb:
+    image: nginx:1.24-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx-lb.conf:/etc/nginx/nginx.conf
+      - ./docker/ssl:/etc/ssl/certs
+      - ./logs/nginx-lb:/var/log/nginx
+    networks:
+      - find3d-network
+    depends_on:
+      - app
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # 监控服务
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - find3d-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - find3d-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # 日志收集
+  fluentd:
+    image: fluent/fluentd:v1.16-debian-1
+    ports:
+      - "24224:24224"
+    volumes:
+      - ./docker/fluentd.conf:/fluentd/etc/fluent.conf
+      - ./logs:/var/log
+    networks:
+      - find3d-network
+    restart: unless-stopped
+    profiles:
+      - logging
+
+networks:
+  find3d-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  redis-data:
+    driver: local
+  api-node-modules:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# 开发环境覆盖配置
+# 使用: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up

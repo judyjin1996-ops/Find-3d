@@ -1,0 +1,13 @@
+# Find3D Material Search - Kubernetes Namespace
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: find3d
+  labels:
+    name: find3d
+    app: find3d-material-search
+    environment: production
+  annotations:
+    description: "Find3D Material Search Platform"
+    contact: "team@find3d.com"

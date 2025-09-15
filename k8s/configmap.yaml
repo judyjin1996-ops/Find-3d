@@ -1,0 +1,142 @@
+# Find3D Material Search - Kubernetes ConfigMap
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: find3d-config
+  namespace: find3d
+  labels:
+    app: find3d-material-search
+data:
+  # 应用配置
+  NODE_ENV: "production"
+  APP_NAME: "Find3D Material Search"
+  APP_VERSION: "1.0.0"
+  
+  # API配置
+  API_BASE_URL: "https://api.find3d.com"
+  CDN_BASE_URL: "https://cdn.find3d.com"
+  
+  # 爬虫配置
+  CRAWLER_MAX_CONCURRENT: "5"
+  CRAWLER_DEFAULT_DELAY: "2000"
+  CRAWLER_MAX_RETRIES: "3"
+  CRAWLER_TIMEOUT: "30000"
+  CRAWLER_RESPECT_ROBOTS_TXT: "true"
+  
+  # 缓存配置
+  CACHE_DEFAULT_TTL: "86400000"
+  CACHE_MAX_SIZE: "524288000"
+  CACHE_CLEANUP_INTERVAL: "3600000"
+  
+  # 性能配置
+  ENABLE_GZIP: "true"
+  ENABLE_BROTLI: "true"
+  ENABLE_SERVICE_WORKER: "true"
+  ENABLE_IMAGE_OPTIMIZATION: "true"
+  
+  # 监控配置
+  ENABLE_ANALYTICS: "true"
+  ENABLE_ERROR_TRACKING: "true"
+  METRICS_ENDPOINT: "https://metrics.find3d.com/collect"
+  
+  # 日志配置
+  LOG_LEVEL: "warn"
+  ENABLE_ACCESS_LOG: "true"
+  ENABLE_ERROR_LOG: "true"
+  
+  # 功能标志
+  FEATURE_ENABLE_NEW_SEARCH_UI: "true"
+  FEATURE_ENABLE_ADVANCED_FILTERS: "true"
+  FEATURE_ENABLE_BULK_DOWNLOAD: "false"
+  FEATURE_ENABLE_USER_ACCOUNTS: "false"
+  FEATURE_ENABLE_PREMIUM_FEATURES: "false"
+  FEATURE_ENABLE_A11Y_FEATURES: "true"
+  
+  # 限流配置
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  RATE_LIMIT_WINDOW_MS: "60000"
+  SEARCH_RATE_LIMIT_MAX_REQUESTS: "10"
+  SEARCH_RATE_LIMIT_WINDOW_MS: "60000"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: find3d
+  labels:
+    app: find3d-material-search
+    component: nginx
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+    
+    events {
+        worker_connections 1024;
+        use epoll;
+        multi_accept on;
+    }
+    
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log /var/log/nginx/access.log main;
+        
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        server_tokens off;
+        
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_comp_level 6;
+        gzip_types
+            application/javascript
+            application/json
+            text/css
+            text/javascript
+            text/plain
+            text/xml;
+        
+        include /etc/nginx/conf.d/*.conf;
+    }
+  
+  default.conf: |
+    server {
+        listen 8080;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+        
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        location / {
+            try_files $uri $uri/ /index.html;
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+        }
+        
+        location ~ /\. {
+            deny all;
+        }
+    }

@@ -1,0 +1,457 @@
+/* 爬虫规则管理器样式 */
+
+.crawler-rule-manager {
+  @apply space-y-6;
+}
+
+/* 统计卡片样式 */
+.crawler-stats-card {
+  @apply p-4 text-center transition-all duration-200;
+}
+
+.crawler-stats-card:hover {
+  @apply transform -translate-y-1 shadow-md;
+}
+
+.crawler-stats-number {
+  @apply text-2xl font-bold;
+}
+
+.crawler-stats-label {
+  @apply text-sm text-gray-600;
+}
+
+/* 规则列表样式 */
+.crawler-rule-item {
+  @apply transition-all duration-200 border border-gray-200 rounded-lg;
+}
+
+.crawler-rule-item:hover {
+  @apply shadow-md border-gray-300;
+}
+
+.crawler-rule-item--selected {
+  @apply ring-2 ring-blue-500 border-blue-500;
+}
+
+.crawler-rule-item--inactive {
+  @apply opacity-60;
+}
+
+/* 规则状态切换开关 */
+.crawler-rule-toggle {
+  @apply w-10 h-6 rounded-full transition-colors duration-200 cursor-pointer;
+}
+
+.crawler-rule-toggle--active {
+  @apply bg-green-500;
+}
+
+.crawler-rule-toggle--inactive {
+  @apply bg-gray-300;
+}
+
+.crawler-rule-toggle__slider {
+  @apply w-4 h-4 bg-white rounded-full transition-transform duration-200;
+}
+
+.crawler-rule-toggle--active .crawler-rule-toggle__slider {
+  @apply translate-x-5;
+}
+
+.crawler-rule-toggle--inactive .crawler-rule-toggle__slider {
+  @apply translate-x-1;
+}
+
+/* 测试状态徽章 */
+.crawler-test-badge--success {
+  @apply bg-green-100 text-green-800;
+}
+
+.crawler-test-badge--failed {
+  @apply bg-red-100 text-red-800;
+}
+
+.crawler-test-badge--pending {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.crawler-test-badge--testing {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* 规则详情展开区域 */
+.crawler-rule-details {
+  @apply mt-4 pt-4 border-t border-gray-200;
+}
+
+.crawler-rule-details__section {
+  @apply space-y-3;
+}
+
+.crawler-rule-details__title {
+  @apply font-medium text-gray-900;
+}
+
+.crawler-rule-details__item {
+  @apply flex justify-between text-sm;
+}
+
+.crawler-rule-details__label {
+  @apply text-gray-600;
+}
+
+.crawler-rule-details__value {
+  @apply text-gray-900 font-mono text-xs;
+}
+
+/* 选择器代码块 */
+.crawler-selector-code {
+  @apply block text-xs bg-gray-100 p-2 rounded mt-1 font-mono;
+}
+
+/* 测试结果区域 */
+.crawler-test-result {
+  @apply bg-gray-50 rounded-lg p-4;
+}
+
+.crawler-test-result--success {
+  @apply bg-green-50 border border-green-200;
+}
+
+.crawler-test-result--failed {
+  @apply bg-red-50 border border-red-200;
+}
+
+.crawler-test-result__header {
+  @apply flex items-center justify-between mb-3;
+}
+
+.crawler-test-result__status {
+  @apply flex items-center gap-2 font-medium;
+}
+
+.crawler-test-result__status--success {
+  @apply text-green-700;
+}
+
+.crawler-test-result__status--failed {
+  @apply text-red-700;
+}
+
+.crawler-test-result__performance {
+  @apply text-sm text-gray-600;
+}
+
+.crawler-test-result__content {
+  @apply space-y-2;
+}
+
+.crawler-test-result__item {
+  @apply text-xs text-gray-600;
+}
+
+/* 表单样式 */
+.crawler-form {
+  @apply space-y-6;
+}
+
+.crawler-form__tabs {
+  @apply border-b border-gray-200;
+}
+
+.crawler-form__tab {
+  @apply flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors;
+}
+
+.crawler-form__tab--active {
+  @apply border-blue-500 text-blue-600;
+}
+
+.crawler-form__tab--inactive {
+  @apply border-transparent text-gray-500 hover:text-gray-700;
+}
+
+.crawler-form__content {
+  @apply min-h-96;
+}
+
+.crawler-form__section {
+  @apply space-y-4;
+}
+
+.crawler-form__title {
+  @apply text-lg font-medium text-gray-900;
+}
+
+.crawler-form__field {
+  @apply space-y-1;
+}
+
+.crawler-form__label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.crawler-form__input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.crawler-form__input--error {
+  @apply border-red-500;
+}
+
+.crawler-form__error {
+  @apply text-red-500 text-xs;
+}
+
+.crawler-form__textarea {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.crawler-form__select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.crawler-form__checkbox {
+  @apply flex items-start gap-3;
+}
+
+.crawler-form__checkbox-input {
+  @apply mt-1 rounded border-gray-300;
+}
+
+.crawler-form__checkbox-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.crawler-form__checkbox-description {
+  @apply text-xs text-gray-600 mt-1;
+}
+
+/* 导入导出样式 */
+.crawler-import-export {
+  @apply space-y-6;
+}
+
+.crawler-import-export__tabs {
+  @apply border-b border-gray-200;
+}
+
+.crawler-import-export__tab {
+  @apply py-2 px-1 border-b-2 font-medium text-sm transition-colors;
+}
+
+.crawler-import-export__tab--active {
+  @apply border-blue-500 text-blue-600;
+}
+
+.crawler-import-export__tab--inactive {
+  @apply border-transparent text-gray-500 hover:text-gray-700;
+}
+
+.crawler-import-export__content {
+  @apply space-y-4;
+}
+
+.crawler-import-export__title {
+  @apply text-lg font-medium text-gray-900;
+}
+
+.crawler-import-export__description {
+  @apply text-gray-600 text-sm;
+}
+
+/* 文件上传区域 */
+.crawler-file-upload {
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-6 text-center;
+}
+
+.crawler-file-upload:hover {
+  @apply border-gray-400;
+}
+
+.crawler-file-upload__icon {
+  @apply mx-auto text-gray-400 mb-4;
+}
+
+.crawler-file-upload__content {
+  @apply space-y-2;
+}
+
+.crawler-file-upload__button {
+  @apply inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50;
+}
+
+.crawler-file-upload__description {
+  @apply text-sm text-gray-500;
+}
+
+/* 规则预览列表 */
+.crawler-rule-preview {
+  @apply border border-gray-300 rounded-lg;
+}
+
+.crawler-rule-preview__header {
+  @apply p-3 border-b border-gray-300 bg-gray-50;
+}
+
+.crawler-rule-preview__title {
+  @apply font-medium text-gray-900;
+}
+
+.crawler-rule-preview__list {
+  @apply max-h-64 overflow-y-auto;
+}
+
+.crawler-rule-preview__item {
+  @apply p-3 border-b border-gray-200 last:border-b-0;
+}
+
+.crawler-rule-preview__item-header {
+  @apply flex items-center justify-between;
+}
+
+.crawler-rule-preview__item-name {
+  @apply font-medium text-gray-900;
+}
+
+.crawler-rule-preview__item-url {
+  @apply text-sm text-gray-600;
+}
+
+.crawler-rule-preview__item-badges {
+  @apply flex items-center gap-2;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .crawler-stats-grid {
+    @apply grid-cols-2;
+  }
+  
+  .crawler-rule-item__content {
+    @apply flex-col space-y-3;
+  }
+  
+  .crawler-rule-item__actions {
+    @apply flex-wrap gap-2;
+  }
+  
+  .crawler-form__grid {
+    @apply grid-cols-1;
+  }
+}
+
+/* 动画效果 */
+@keyframes crawlerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.crawler-rule-item {
+  animation: crawlerFadeIn 0.3s ease-out;
+}
+
+/* 加载状态 */
+.crawler-loading {
+  @apply animate-pulse;
+}
+
+.crawler-loading__skeleton {
+  @apply bg-gray-200 rounded;
+}
+
+.crawler-loading__skeleton--text {
+  @apply h-4;
+}
+
+.crawler-loading__skeleton--title {
+  @apply h-6 w-3/4;
+}
+
+.crawler-loading__skeleton--button {
+  @apply h-8 w-20;
+}
+
+/* 深色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .crawler-rule-item {
+    @apply border-gray-700 bg-gray-800;
+  }
+  
+  .crawler-rule-item:hover {
+    @apply border-gray-600;
+  }
+  
+  .crawler-rule-details {
+    @apply border-gray-700;
+  }
+  
+  .crawler-selector-code {
+    @apply bg-gray-700 text-gray-300;
+  }
+  
+  .crawler-test-result {
+    @apply bg-gray-700;
+  }
+  
+  .crawler-form__input,
+  .crawler-form__textarea,
+  .crawler-form__select {
+    @apply bg-gray-800 border-gray-600 text-gray-100;
+  }
+  
+  .crawler-file-upload {
+    @apply border-gray-600 bg-gray-800;
+  }
+  
+  .crawler-rule-preview {
+    @apply border-gray-600 bg-gray-800;
+  }
+  
+  .crawler-rule-preview__header {
+    @apply bg-gray-700 border-gray-600;
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .crawler-rule-item {
+    @apply border-2 border-gray-900;
+  }
+  
+  .crawler-rule-toggle--active {
+    @apply bg-green-600 border border-green-900;
+  }
+  
+  .crawler-rule-toggle--inactive {
+    @apply bg-gray-400 border border-gray-900;
+  }
+  
+  .crawler-test-badge--success {
+    @apply bg-green-200 text-green-900 border border-green-900;
+  }
+  
+  .crawler-test-badge--failed {
+    @apply bg-red-200 text-red-900 border border-red-900;
+  }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+  .crawler-rule-item,
+  .crawler-rule-toggle,
+  .crawler-rule-toggle__slider {
+    @apply transition-none;
+  }
+  
+  .crawler-rule-item {
+    animation: none;
+  }
+}

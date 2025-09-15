@@ -1,0 +1,356 @@
+# Find3D Material Search - 生产环境 Docker Compose 配置
+
+version: '3.8'
+
+services:
+  # 前端应用 - 生产配置
+  app:
+    image: find3d/material-search:${APP_VERSION:-latest}
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=${API_BASE_URL}
+      - CDN_BASE_URL=${CDN_BASE_URL}
+      - ENABLE_ANALYTICS=true
+      - ENABLE_ERROR_TRACKING=true
+      - SENTRY_DSN=${SENTRY_DSN}
+      - METRICS_ENDPOINT=${METRICS_ENDPOINT}
+    secrets:
+      - api_key
+      - sentry_dsn
+    networks:
+      - find3d-prod-network
+      - monitoring-network
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        tag: "find3d.app"
+
+  # Redis 集群
+  redis-master:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --replica-announce-ip redis-master
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    volumes:
+      - redis-master-data:/data
+    networks:
+      - find3d-prod-network
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        tag: "find3d.redis.master"
+
+  redis-replica:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --replicaof redis-master 6379
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    volumes:
+      - redis-replica-data:/data
+    networks:
+      - find3d-prod-network
+    depends_on:
+      - redis-master
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        tag: "find3d.redis.replica"
+
+  # 负载均衡器
+  nginx-lb:
+    image: nginx:1.24-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    volumes:
+      - ./docker/nginx-prod.conf:/etc/nginx/nginx.conf:ro
+      - ssl-certs:/etc/ssl/certs:ro
+      - nginx-cache:/var/cache/nginx
+    networks:
+      - find3d-prod-network
+    depends_on:
+      - app
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        tag: "find3d.nginx"
+
+  # API 服务
+  api:
+    image: find3d/api:${API_VERSION:-latest}
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis-master:6379
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - CRAWLER_MAX_CONCURRENT=${CRAWLER_MAX_CONCURRENT:-5}
+    secrets:
+      - database_url
+      - jwt_secret
+      - crawler_config
+    networks:
+      - find3d-prod-network
+      - database-network
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        tag: "find3d.api"
+
+  # 数据库
+  postgres:
+    image: postgres:15-alpine
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-find3d}
+      - POSTGRES_USER=${POSTGRES_USER:-find3d}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - database-network
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        tag: "find3d.postgres"
+
+  # 监控服务
+  prometheus:
+    image: prom/prometheus:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    volumes:
+      - ./docker/prometheus-prod.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - monitoring-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_password
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=${GRAFANA_DOMAIN:-grafana.find3d.com}
+      - GF_SERVER_ROOT_URL=https://${GRAFANA_DOMAIN:-grafana.find3d.com}
+    secrets:
+      - grafana_password
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/prod-dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/prod-datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - monitoring-network
+
+  # 日志收集
+  fluentd:
+    image: fluent/fluentd:v1.16-debian-1
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    volumes:
+      - ./docker/fluentd-prod.conf:/fluentd/etc/fluent.conf:ro
+      - fluentd-buffer:/var/log/fluentd-buffers
+    networks:
+      - find3d-prod-network
+      - monitoring-network
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}
+      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT:-9200}
+
+  # 备份服务
+  backup:
+    image: find3d/backup:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    environment:
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - S3_REGION=${BACKUP_S3_REGION}
+    secrets:
+      - aws_access_key
+      - aws_secret_key
+    volumes:
+      - postgres-data:/backup/postgres:ro
+      - redis-master-data:/backup/redis:ro
+    networks:
+      - find3d-prod-network
+
+networks:
+  find3d-prod-network:
+    driver: overlay
+    attachable: true
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+  
+  database-network:
+    driver: overlay
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+  
+  monitoring-network:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 10.0.3.0/24
+
+volumes:
+  redis-master-data:
+    driver: local
+  redis-replica-data:
+    driver: local
+  postgres-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  nginx-cache:
+    driver: local
+  ssl-certs:
+    driver: local
+  fluentd-buffer:
+    driver: local
+
+secrets:
+  api_key:
+    external: true
+  sentry_dsn:
+    external: true
+  database_url:
+    external: true
+  jwt_secret:
+    external: true
+  postgres_password:
+    external: true
+  grafana_password:
+    external: true
+  crawler_config:
+    external: true
+  aws_access_key:
+    external: true
+  aws_secret_key:
+    external: true
+
+configs:
+  nginx_config:
+    file: ./docker/nginx-prod.conf
+  prometheus_config:
+    file: ./docker/prometheus-prod.yml

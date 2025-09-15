@@ -1,0 +1,436 @@
+/**
+ * 搜索状态监控组件样式
+ */
+
+.search-status-monitor {
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-status-monitor.pending {
+  background-color: #fefce8;
+  border-color: #facc15;
+}
+
+.search-status-monitor.running {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.search-status-monitor.paused {
+  background-color: #fff7ed;
+  border-color: #f97316;
+}
+
+.search-status-monitor.completed {
+  background-color: #f0fdf4;
+  border-color: #22c55e;
+}
+
+.search-status-monitor.failed {
+  background-color: #fef2f2;
+  border-color: #ef4444;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-icon {
+  font-size: 24px;
+}
+
+.status-text {
+  font-weight: 500;
+}
+
+.status-text.pending {
+  color: #ca8a04;
+}
+
+.status-text.running {
+  color: #2563eb;
+}
+
+.status-text.paused {
+  color: #ea580c;
+}
+
+.status-text.completed {
+  color: #16a34a;
+}
+
+.status-text.failed {
+  color: #dc2626;
+}
+
+.status-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.status-action-button {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-action-button:hover {
+  transform: translateY(-1px);
+}
+
+.status-action-button.pause {
+  background-color: #fed7aa;
+  color: #ea580c;
+}
+
+.status-action-button.pause:hover {
+  background-color: #fdba74;
+}
+
+.status-action-button.resume {
+  background-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.status-action-button.resume:hover {
+  background-color: #93c5fd;
+}
+
+.status-action-button.cancel {
+  background-color: #fecaca;
+  color: #dc2626;
+}
+
+.status-action-button.cancel:hover {
+  background-color: #fca5a5;
+}
+
+.progress-section {
+  margin-bottom: 16px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 12px;
+  background-color: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  display: flex;
+  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-success {
+  background-color: #22c55e;
+  transition: width 0.3s ease;
+}
+
+.progress-failed {
+  background-color: #ef4444;
+  transition: width 0.3s ease;
+}
+
+.progress-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.progress-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.progress-legend-dot.success {
+  background-color: #22c55e;
+}
+
+.progress-legend-dot.failed {
+  background-color: #ef4444;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stats-item {
+  text-align: center;
+}
+
+.stats-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+}
+
+.stats-label {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.results-preview {
+  margin-bottom: 16px;
+}
+
+.results-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.results-list {
+  max-height: 128px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #f3f4f6;
+}
+
+.result-image {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.result-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.result-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.result-meta {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.result-price {
+  margin-left: 8px;
+}
+
+.result-price.free {
+  color: #16a34a;
+}
+
+.result-price.paid {
+  color: #2563eb;
+}
+
+.errors-section {
+  margin-bottom: 16px;
+}
+
+.errors-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #dc2626;
+  margin-bottom: 8px;
+}
+
+.errors-list {
+  max-height: 96px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error-item {
+  font-size: 11px;
+  color: #dc2626;
+  background-color: #fef2f2;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.error-website {
+  font-weight: 500;
+}
+
+.task-details {
+  font-size: 11px;
+  color: #64748b;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 动画效果 */
+@keyframes pulse-running {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.search-status-monitor.running .status-icon {
+  animation: pulse-running 2s infinite;
+}
+
+.progress-success.running {
+  background: linear-gradient(90deg, #22c55e, #4ade80, #22c55e);
+  background-size: 200% 100%;
+  animation: progress-shimmer 2s infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .search-status-monitor {
+    padding: 12px;
+  }
+  
+  .status-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .status-actions {
+    align-self: stretch;
+    justify-content: flex-end;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .result-item {
+    padding: 6px;
+  }
+  
+  .result-image {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .task-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .search-status-monitor.pending {
+    background-color: #451a03;
+    border-color: #a16207;
+  }
+  
+  .search-status-monitor.running {
+    background-color: #1e3a8a;
+    border-color: #3b82f6;
+  }
+  
+  .search-status-monitor.paused {
+    background-color: #431407;
+    border-color: #ea580c;
+  }
+  
+  .search-status-monitor.completed {
+    background-color: #14532d;
+    border-color: #22c55e;
+  }
+  
+  .search-status-monitor.failed {
+    background-color: #450a0a;
+    border-color: #ef4444;
+  }
+  
+  .result-item {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  .result-title {
+    color: #f9fafb;
+  }
+  
+  .stats-value {
+    color: #f9fafb;
+  }
+  
+  .results-title {
+    color: #f3f4f6;
+  }
+  
+  .task-details {
+    color: #9ca3af;
+    border-top-color: #4b5563;
+  }
+}

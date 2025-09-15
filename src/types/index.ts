@@ -1,4 +1,90 @@
-// 素材搜索结果类型
+// 素材搜索结果类型 - 扩展版本
+export interface ExtractedMaterialResult {
+  // 基础信息
+  id: string;
+  title: string;
+  description?: string;
+  sourceWebsite: string;
+  sourceUrl: string;
+  
+  // 媒体内容
+  previewImages: Array<{
+    url: string;
+    alt?: string;
+    size?: 'thumbnail' | 'medium' | 'large';
+  }>;
+  
+  // 价格信息
+  pricing: {
+    isFree: boolean;
+    price?: number;
+    currency?: string;
+    originalPrice?: number; // 原价
+    discount?: number; // 折扣百分比
+    priceText?: string; // 原始价格文本
+  };
+  
+  // 文件信息
+  fileInfo: {
+    format?: string;
+    size?: string;
+    sizeBytes?: number;
+    downloadUrl?: string;
+  };
+  
+  // 统计信息
+  statistics: {
+    downloadCount?: number;
+    viewCount?: number;
+    likeCount?: number;
+    rating?: number;
+    reviewCount?: number;
+  };
+  
+  // 分类和标签
+  categorization: {
+    category?: string;
+    subcategory?: string;
+    tags: string[];
+    keywords?: string[];
+  };
+  
+  // 作者信息
+  author?: {
+    name: string;
+    profileUrl?: string;
+    avatar?: string;
+  };
+  
+  // 时间信息
+  timestamps: {
+    uploadDate?: Date;
+    lastUpdated?: Date;
+    extractedAt: Date;
+  };
+  
+  // 提取元数据
+  extraction: {
+    ruleId: string;
+    status: 'success' | 'partial' | 'failed';
+    confidence: number; // 提取置信度 0-1
+    missingFields: string[];
+    errors?: string[];
+    processingTime: number;
+  };
+  
+  // 质量评分
+  quality: {
+    score: number; // 0-100
+    factors: {
+      completeness: number;
+      imageQuality: number;
+      dataAccuracy: number;
+    };
+  };
+}
+
+// 向后兼容的MaterialResult类型
 export interface MaterialResult {
   id: string;
   title: string;
@@ -16,6 +102,18 @@ export interface MaterialResult {
   downloadCount?: number;
   uploadDate?: Date;
   author?: string;
+}
+
+// 卡片样式类型
+export type CardStyle = 'compact' | 'standard' | 'detailed';
+
+// 显示字段配置
+export interface DisplayFieldConfig {
+  key: string;
+  label: string;
+  visible: boolean;
+  order: number;
+  width?: number;
 }
 
 // 网站配置类型

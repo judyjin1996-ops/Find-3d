@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find 3D - 智能结果卡片演示</title>
+    <meta name="description" content="Find 3D 智能结果卡片组件演示页面，展示不同样式和功能特性" />
+    
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="/src/main.tsx" as="script" />
+    <link rel="preload" href="/src/index.css" as="style" />
+    
+    <!-- 样式 -->
+    <style>
+      /* 加载动画 */
+      .loading-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-text {
+        margin-top: 16px;
+        color: #64748b;
+        font-size: 14px;
+      }
+      
+      /* 隐藏加载动画 */
+      .loaded .loading-container {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 加载动画 -->
+    <div class="loading-container">
+      <div class="text-center">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载组件演示...</div>
+      </div>
+    </div>
+    
+    <!-- React 应用容器 -->
+    <div id="demo-root"></div>
+    
+    <!-- 演示应用脚本 -->
+    <script type="module">
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+      import DemoApp from '/src/DemoApp.tsx';
+      import '/src/index.css';
+      
+      // 创建根元素并渲染演示应用
+      const root = ReactDOM.createRoot(document.getElementById('demo-root'));
+      root.render(React.createElement(DemoApp));
+      
+      // 隐藏加载动画
+      document.body.classList.add('loaded');
+      
+      // 错误处理
+      window.addEventListener('error', (event) => {
+        console.error('演示页面错误:', event.error);
+      });
+      
+      // 未处理的Promise拒绝
+      window.addEventListener('unhandledrejection', (event) => {
+        console.error('未处理的Promise拒绝:', event.reason);
+      });
+    </script>
+  </body>
+</html>

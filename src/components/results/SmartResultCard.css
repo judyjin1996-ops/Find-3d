@@ -1,0 +1,274 @@
+/* 智能结果卡片样式 */
+
+.smart-result-card {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.smart-result-card:hover {
+  @apply transform -translate-y-1 shadow-lg;
+}
+
+/* 卡片样式变体 */
+.smart-result-card--compact {
+  @apply p-3;
+}
+
+.smart-result-card--standard {
+  @apply p-4;
+}
+
+.smart-result-card--detailed {
+  @apply p-5;
+}
+
+/* 图片容器样式 */
+.smart-result-card__image-container {
+  @apply relative overflow-hidden rounded-lg bg-gray-100;
+}
+
+.smart-result-card__image-container--compact {
+  @apply w-20 h-20;
+}
+
+.smart-result-card__image-container--standard {
+  @apply aspect-video;
+}
+
+.smart-result-card__image-container--detailed {
+  @apply aspect-video;
+}
+
+/* 图片样式 */
+.smart-result-card__image {
+  @apply w-full h-full object-cover transition-transform duration-200;
+}
+
+.smart-result-card__image:hover {
+  @apply scale-105;
+}
+
+/* 图片加载状态 */
+.smart-result-card__image-loading {
+  @apply animate-pulse bg-gray-200;
+}
+
+.smart-result-card__image-error {
+  @apply flex items-center justify-center bg-gray-100 text-gray-400;
+}
+
+/* 状态指示器 */
+.smart-result-card__status-indicator {
+  @apply absolute flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.smart-result-card__status-indicator--success {
+  @apply bg-green-100 text-green-700;
+}
+
+.smart-result-card__status-indicator--partial {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+.smart-result-card__status-indicator--failed {
+  @apply bg-red-100 text-red-700;
+}
+
+/* 质量评分 */
+.smart-result-card__quality-score {
+  @apply flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.smart-result-card__quality-score--high {
+  @apply bg-green-100 text-green-700;
+}
+
+.smart-result-card__quality-score--medium {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+.smart-result-card__quality-score--low {
+  @apply bg-red-100 text-red-700;
+}
+
+/* 价格显示 */
+.smart-result-card__price {
+  @apply flex items-center gap-2;
+}
+
+.smart-result-card__price--free {
+  @apply text-green-600 font-semibold;
+}
+
+.smart-result-card__price--paid {
+  @apply text-blue-600 font-semibold;
+}
+
+.smart-result-card__price--original {
+  @apply text-gray-400 line-through text-sm;
+}
+
+.smart-result-card__price--discount {
+  @apply bg-red-100 text-red-700 px-1 py-0.5 rounded text-xs;
+}
+
+/* 统计信息 */
+.smart-result-card__stats {
+  @apply flex items-center gap-3 text-sm text-gray-600;
+}
+
+.smart-result-card__stat-item {
+  @apply flex items-center gap-1;
+}
+
+/* 标签样式 */
+.smart-result-card__tags {
+  @apply flex flex-wrap gap-1;
+}
+
+.smart-result-card__tag {
+  @apply px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs;
+}
+
+/* 评分星级 */
+.smart-result-card__rating {
+  @apply flex items-center gap-1;
+}
+
+.smart-result-card__star {
+  @apply w-3 h-3;
+}
+
+.smart-result-card__star--filled {
+  @apply text-yellow-400;
+}
+
+.smart-result-card__star--empty {
+  @apply text-gray-300;
+}
+
+/* 作者信息 */
+.smart-result-card__author {
+  @apply flex items-center gap-2 text-sm text-gray-600;
+}
+
+.smart-result-card__author-avatar {
+  @apply w-6 h-6 rounded-full bg-gray-200;
+}
+
+/* 时间信息 */
+.smart-result-card__timestamp {
+  @apply text-xs text-gray-500;
+}
+
+/* 提取信息 */
+.smart-result-card__extraction-info {
+  @apply text-xs text-gray-500 border-t pt-2 mt-2;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .smart-result-card--standard,
+  .smart-result-card--detailed {
+    @apply p-3;
+  }
+  
+  .smart-result-card__stats {
+    @apply flex-col items-start gap-1;
+  }
+  
+  .smart-result-card__tags {
+    @apply max-w-full;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.smart-result-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 加载骨架屏 */
+.smart-result-card__skeleton {
+  @apply animate-pulse;
+}
+
+.smart-result-card__skeleton-image {
+  @apply bg-gray-200 rounded-lg;
+}
+
+.smart-result-card__skeleton-text {
+  @apply bg-gray-200 rounded h-4;
+}
+
+.smart-result-card__skeleton-text--short {
+  @apply w-3/4;
+}
+
+.smart-result-card__skeleton-text--long {
+  @apply w-full;
+}
+
+/* 深色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .smart-result-card__image-container {
+    @apply bg-gray-800;
+  }
+  
+  .smart-result-card__image-error {
+    @apply bg-gray-800 text-gray-500;
+  }
+  
+  .smart-result-card__tag {
+    @apply bg-gray-700 text-gray-300;
+  }
+  
+  .smart-result-card__skeleton-image,
+  .smart-result-card__skeleton-text {
+    @apply bg-gray-700;
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .smart-result-card {
+    @apply border-2 border-gray-900;
+  }
+  
+  .smart-result-card__status-indicator--success {
+    @apply bg-green-200 text-green-900 border border-green-900;
+  }
+  
+  .smart-result-card__status-indicator--partial {
+    @apply bg-yellow-200 text-yellow-900 border border-yellow-900;
+  }
+  
+  .smart-result-card__status-indicator--failed {
+    @apply bg-red-200 text-red-900 border border-red-900;
+  }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+  .smart-result-card,
+  .smart-result-card__image {
+    @apply transition-none;
+  }
+  
+  .smart-result-card:hover {
+    @apply transform-none;
+  }
+  
+  .smart-result-card__image:hover {
+    @apply scale-100;
+  }
+}

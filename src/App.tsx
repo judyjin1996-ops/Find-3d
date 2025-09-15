@@ -116,14 +116,24 @@ function App() {
             <h2 className={`font-bold text-sketch-text ${isMobile ? 'text-xl' : 'text-2xl'}`}>
               功能特色
             </h2>
-            <Button
-              variant="outline"
-              size={isMobile ? 'sm' : 'md'}
-              onClick={() => setShowWebsiteManager(true)}
-              icon={<Icon name="settings" size="sm" />}
-            >
-              {isMobile ? '管理' : `管理网站 (${stats.active}/${stats.total})`}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size={isMobile ? 'sm' : 'md'}
+                onClick={() => window.open('/demo', '_blank')}
+                icon={<Icon name="eye" size="sm" />}
+              >
+                {isMobile ? '演示' : '组件演示'}
+              </Button>
+              <Button
+                variant="outline"
+                size={isMobile ? 'sm' : 'md'}
+                onClick={() => setShowWebsiteManager(true)}
+                icon={<Icon name="settings" size="sm" />}
+              >
+                {isMobile ? '管理' : `管理网站 (${stats.active}/${stats.total})`}
+              </Button>
+            </div>
           </div>
 
           <div className={`grid gap-4 ${
