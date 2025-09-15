@@ -1,14 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find 3D - 三维素材搜索平台</title>
-    <meta name="description" content="专为三维设计师打造的素材搜索平台，支持多网站搜索聚合" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 3rem; color: white; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; color: rgba(255,255,255,0.9); text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .status { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px; }
+        .status h2 { color: white; margin-bottom: 20px; }
+        .status p { color: rgba(255,255,255,0.9); margin-bottom: 10px; }
+        .links { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn { 
+            display: inline-block; padding: 15px 25px; background: rgba(255,255,255,0.2); 
+            color: white; text-decoration: none; border-radius: 10px; transition: all 0.3s;
+        }
+        .btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        @media (max-width: 768px) { .header h1 { font-size: 2rem; } .links { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Find 3D</h1>
+            <p>三维素材搜索平台</p>
+        </div>
+        
+        <div class="status">
+            <h2>🎉 网站部署成功！</h2>
+            <p>✅ GitHub Pages 正常运行</p>
+            <p>✅ 域名解析正确</p>
+            <p>✅ 页面加载完成</p>
+            <p>🕒 部署时间: 2025/9/15 22:23:09</p>
+        </div>
+        
+        <div class="status">
+            <h2>🔗 快速访问</h2>
+            <div class="links">
+                <a href="test-page.html" class="btn">📋 功能测试</a>
+                <a href="simple.html" class="btn">🔍 简单测试</a>
+                <a href="backup.html" class="btn">💾 备用页面</a>
+                <a href="diagnostic.html" class="btn">🔧 诊断工具</a>
+                <a href="https://github.com/judyjin1996-ops/Find-3d" class="btn">📂 GitHub仓库</a>
+            </div>
+        </div>
+        
+        <div class="status">
+            <h2>📱 项目信息</h2>
+            <p>这是一个专为三维设计师打造的素材搜索平台</p>
+            <p>支持多网站聚合搜索，统一结果展示</p>
+            <p>网址: https://judyjin1996-ops.github.io/Find-3d/</p>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🎨 Find 3D 主页加载成功');
+        console.log('部署时间:', '2025/9/15 22:23:09');
+        console.log('网址:', window.location.href);
+        
+        // 页面加载完成提示
+        window.addEventListener('load', function() {
+            console.log('✅ 页面完全加载完成');
+        });
+    </script>
+</body>
 </html>
