@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { smartCacheService, CacheStats } from '../services/smartCacheService';
-import { ExtractedMaterialResult } from '../crawler/types/crawler';
+import type { ExtractedMaterialResult } from '../crawler/types/crawler';
 
 export interface UseSmartCacheOptions {
   autoRefresh?: boolean;

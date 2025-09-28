@@ -134,34 +134,44 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         try {
           await imageLoadPromise;
         } catch {
-          // 如果直接加载失败，尝试通过fetch（可能有CORS限制）
+          // 如果直接加载失败，尝试不同的加载策略
+          console.warn('图片直接加载失败，尝试其他方式:', src);
+          
+          // 策略1: 尝试不设置crossOrigin
           try {
-            const response = await fetch(src, {
-              mode: 'cors',
-              credentials: 'omit'
+            const fallbackImage = new Image();
+            const fallbackPromise = new Promise<void>((resolve, reject) => {
+              fallbackImage.onload = () => {
+                setImageSrc(src);
+                setIsLoading(false);
+                onLoad?.();
+                resolve();
+              };
+              fallbackImage.onerror = () => reject(new Error('Fallback failed'));
+              setTimeout(() => reject(new Error('Fallback timeout')), 5000);
             });
             
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
+            fallbackImage.src = src;
+            await fallbackPromise;
+          } catch {
+            // 策略2: 尝试通过fetch（可能有CORS限制）
+            try {
+              const response = await fetch(src, {
+                mode: 'no-cors', // 改为no-cors模式
+                credentials: 'omit'
+              });
+              
+              // no-cors模式下无法检查状态，直接使用原URL
+              setImageSrc(src);
+              setIsLoading(false);
+              onLoad?.();
+            } catch (fetchError) {
+              // 策略3: 最后的备用方案 - 直接使用原URL并让img元素处理错误
+              console.warn('所有加载策略都失败，使用原URL:', src);
+              setImageSrc(src);
+              setIsLoading(false);
+              // 不设置hasError，让img元素的onError处理
             }
-
-            const blob = await response.blob();
-            
-            // 缓存图片
-            if (enableCache) {
-              cacheService.cacheImage(src, blob);
-            }
-
-            const url = URL.createObjectURL(blob);
-            setImageSrc(url);
-            setIsLoading(false);
-            onLoad?.();
-          } catch (fetchError) {
-            // 如果fetch也失败，尝试使用代理或直接显示原URL
-            console.warn('图片fetch失败，尝试直接显示:', src, fetchError);
-            setImageSrc(src); // 直接使用原URL，让浏览器处理
-            setIsLoading(false);
-            // 不调用onError，让图片元素自己处理错误
           }
         }
 

@@ -1,8 +1,11 @@
 import React from 'react';
 import { Card, Button, Icon, Modal, Badge } from '../ui';
 import { WebsiteForm } from './WebsiteForm';
+import { AdvancedWebsiteForm } from './AdvancedWebsiteForm';
 import { WebsiteList } from './WebsiteList';
 import type { WebsiteConfig } from '../../types';
+import type { CrawlerRule } from '../../crawler/types/crawler';
+import { crawlerService } from '../../services/crawlerService';
 
 interface WebsiteManagerProps {
   websites: WebsiteConfig[];
@@ -22,15 +25,60 @@ export const WebsiteManager: React.FC<WebsiteManagerProps> = ({
   className = ''
 }) => {
   const [showAddModal, setShowAddModal] = React.useState(false);
+  const [showAdvancedModal, setShowAdvancedModal] = React.useState(false);
   const [editingWebsite, setEditingWebsite] = React.useState<WebsiteConfig | null>(null);
+  const [editingCrawlerRule, setEditingCrawlerRule] = React.useState<CrawlerRule | null>(null);
   const [deleteConfirm, setDeleteConfirm] = React.useState<string | null>(null);
+  const [crawlerRules, setCrawlerRules] = React.useState<CrawlerRule[]>([]);
 
   const activeCount = websites.filter(w => w.isActive).length;
   const totalCount = websites.length;
 
+  // 加载爬虫规则
+  React.useEffect(() => {
+    const loadCrawlerRules = async () => {
+      try {
+        await crawlerService.initialize();
+        const availableWebsites = crawlerService.getAvailableWebsites();
+        // 这里需要获取完整的爬虫规则，暂时使用空数组
+        setCrawlerRules([]);
+      } catch (error) {
+        console.error('加载爬虫规则失败:', error);
+      }
+    };
+    loadCrawlerRules();
+  }, []);
+
   const handleAdd = (websiteData: Omit<WebsiteConfig, 'id'>) => {
     onAdd(websiteData);
     setShowAddModal(false);
+  };
+
+  const handleAdvancedAdd = async (rule: CrawlerRule) => {
+    try {
+      await crawlerService.addCustomWebsite({
+        websiteName: rule.websiteName,
+        baseUrl: rule.baseUrl,
+        searchUrlTemplate: rule.searchConfig.urlTemplate,
+        selectors: {
+          listContainer: rule.parseConfig.listSelectors.container,
+          listItem: rule.parseConfig.listSelectors.item,
+          listLink: rule.parseConfig.listSelectors.link,
+          detailTitle: rule.parseConfig.detailSelectors.title,
+          detailImages: rule.parseConfig.detailSelectors.images,
+          detailDescription: rule.parseConfig.detailSelectors.description
+        },
+        antiDetection: {
+          delay: rule.antiDetection.requestConfig.delay,
+          useHeadlessBrowser: rule.antiDetection.useHeadlessBrowser
+        }
+      });
+      setShowAdvancedModal(false);
+      // 刷新网站列表
+      window.location.reload();
+    } catch (error) {
+      console.error('添加自定义网站失败:', error);
+    }
   };
 
   const handleEdit = (websiteData: WebsiteConfig) => {
@@ -40,9 +88,44 @@ export const WebsiteManager: React.FC<WebsiteManagerProps> = ({
     }
   };
 
+  const handleAdvancedEdit = async (rule: CrawlerRule) => {
+    try {
+      if (editingCrawlerRule) {
+        await crawlerService.updateCustomWebsite(editingCrawlerRule.id, rule);
+        setEditingCrawlerRule(null);
+        setShowAdvancedModal(false);
+        // 刷新网站列表
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('更新自定义网站失败:', error);
+    }
+  };
+
   const handleDelete = (id: string) => {
     onDelete(id);
     setDeleteConfirm(null);
+  };
+
+  const handleTestRule = async (rule: CrawlerRule, keyword: string) => {
+    try {
+      const result = await crawlerService.testWebsiteRule(rule.id, keyword);
+      return {
+        success: result.success,
+        results: result.results.map(r => ({
+          title: r.title,
+          url: r.sourceUrl,
+          image: r.previewImages[0]?.url
+        })),
+        errors: result.errors
+      };
+    } catch (error) {
+      return {
+        success: false,
+        results: [],
+        errors: [error instanceof Error ? error.message : '测试失败']
+      };
+    }
   };
 
   return (
@@ -61,12 +144,21 @@ export const WebsiteManager: React.FC<WebsiteManagerProps> = ({
             </div>
           </div>
           
-          <Button
-            onClick={() => setShowAddModal(true)}
-            icon={<Icon name="plus" size="sm" />}
-          >
-            添加网站
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddModal(true)}
+              icon={<Icon name="plus" size="sm" />}
+            >
+              简单添加
+            </Button>
+            <Button
+              onClick={() => setShowAdvancedModal(true)}
+              icon={<Icon name="settings" size="sm" />}
+            >
+              高级配置
+            </Button>
+          </div>
         </div>
 
         <WebsiteList
@@ -77,16 +169,37 @@ export const WebsiteManager: React.FC<WebsiteManagerProps> = ({
         />
       </Card>
 
-      {/* 添加网站模态框 */}
+      {/* 简单添加网站模态框 */}
       <Modal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title="添加新网站"
+        title="简单添加网站"
         size="lg"
       >
         <WebsiteForm
           onSubmit={handleAdd}
           onCancel={() => setShowAddModal(false)}
+        />
+      </Modal>
+
+      {/* 高级爬虫配置模态框 */}
+      <Modal
+        open={showAdvancedModal}
+        onClose={() => {
+          setShowAdvancedModal(false);
+          setEditingCrawlerRule(null);
+        }}
+        title={editingCrawlerRule ? "编辑爬虫规则" : "高级爬虫配置"}
+        size="xl"
+      >
+        <AdvancedWebsiteForm
+          initialData={editingCrawlerRule || undefined}
+          onSubmit={editingCrawlerRule ? handleAdvancedEdit : handleAdvancedAdd}
+          onCancel={() => {
+            setShowAdvancedModal(false);
+            setEditingCrawlerRule(null);
+          }}
+          onTest={handleTestRule}
         />
       </Modal>
 

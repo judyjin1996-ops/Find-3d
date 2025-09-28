@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CrawlerRuleManager } from './CrawlerRuleManager';
+import type { CrawlerRuleManager } from './CrawlerRuleManager';
 import { Card, Button, Icon, Badge } from '../ui';
 import type { CrawlerRule, TestResult } from '../../crawler/types/crawler';
 

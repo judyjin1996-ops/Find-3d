@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { CrawlingTask, CrawlingError, ExtractedMaterialResult } from '../../crawler/types/crawler';
+import type { CrawlingTask, CrawlingError, ExtractedMaterialResult } from '../../crawler/types/crawler';
 import './SearchStatusMonitor.css';
 
 interface SearchStatusMonitorProps {

@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Card, Button, Icon, Modal, Badge, Tooltip, Loading } from '../ui';
-import { CrawlerRuleForm } from './CrawlerRuleForm';
-import { CrawlerRuleList } from './CrawlerRuleList';
-import { CrawlerRuleImportExport } from './CrawlerRuleImportExport';
+import type { CrawlerRuleForm } from './CrawlerRuleForm';
+import type { CrawlerRuleList } from './CrawlerRuleList';
+import type { CrawlerRuleImportExport } from './CrawlerRuleImportExport';
 import type { CrawlerRule, TestResult } from '../../crawler/types/crawler';
 
 interface CrawlerRuleManagerProps {

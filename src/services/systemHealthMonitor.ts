@@ -3,7 +3,7 @@
  * 监控系统性能、资源使用和错误状态
  */
 
-import { CrawlingError, CrawlerErrorType } from '../crawler/types/crawler';
+import type { CrawlingError, CrawlerErrorType } from '../crawler/types/crawler';
 
 export interface SystemHealth {
   overall: 'healthy' | 'warning' | 'critical';

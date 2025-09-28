@@ -3,7 +3,7 @@
  * 负责验证爬取数据的完整性和准确性
  */
 
-import { ExtractedMaterialResult, CrawlerRule } from '../types/crawler';
+import type { ExtractedMaterialResult, CrawlerRule } from '../types/crawler';
 
 export interface ValidationResult {
   isValid: boolean;

@@ -4,8 +4,8 @@
  */
 
 import { Page } from 'puppeteer';
-import { CrawlerRule } from '../types/crawler';
-import { ExtractedData } from './ContentExtractor';
+import type { CrawlerRule } from '../types/crawler';
+import type { ExtractedData } from './ContentExtractor';
 
 export interface SmartExtractionResult extends ExtractedData {
   confidence: number; // 提取置信度 0-1

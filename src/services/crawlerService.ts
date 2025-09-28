@@ -4,7 +4,7 @@
  */
 
 import { crawlerManager } from '../crawler/manager/CrawlerManager';
-import { CrawlerSearchRequest, CrawlerSearchResponse, CrawlingTask, ExtractedMaterialResult, CrawlerRule } from '../crawler/types/crawler';
+import type { CrawlerSearchRequest, CrawlerSearchResponse, CrawlingTask, ExtractedMaterialResult, CrawlerRule } from '../crawler/types/crawler';
 
 export class CrawlerService {
   private isInitialized = false;

@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { CrawlerTaskScheduler } from './CrawlerTaskScheduler';
 import { SearchStatusMonitor } from '../search/SearchStatusMonitor';
-import { CrawlingTask } from '../../crawler/types/crawler';
+import type { CrawlingTask } from '../../crawler/types/crawler';
 import { crawlerService } from '../../services/crawlerService';
 import { webSocketService } from '../../services/websocketService';
 

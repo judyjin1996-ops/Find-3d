@@ -3,7 +3,7 @@
  * 提供实时通信功能，用于爬虫任务状态更新
  */
 
-import { CrawlingTask, CrawlingError, ExtractedMaterialResult } from '../crawler/types/crawler';
+import type { CrawlingTask, CrawlingError, ExtractedMaterialResult } from '../crawler/types/crawler';
 
 export interface WebSocketMessage {
   type: 'task_progress' | 'task_completed' | 'task_started' | 'task_paused' | 'task_resumed' | 'task_cancelled' | 'task_result' | 'task_error' | 'system_status';

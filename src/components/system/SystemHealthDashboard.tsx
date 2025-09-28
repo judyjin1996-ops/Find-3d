@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { SystemHealth, SystemAlert, ComponentHealth, systemHealthMonitor } from '../../services/systemHealthMonitor';
+import type { SystemHealth, SystemAlert, ComponentHealth, systemHealthMonitor } from '../../services/systemHealthMonitor';
 
 interface SystemHealthDashboardProps {
   onAlertAcknowledge?: (alertId: string) => void;

@@ -4,7 +4,7 @@
  */
 
 import { CrawlerEngine } from '../engine/CrawlerEngine';
-import { CrawlerRule, CrawlerSearchRequest, CrawlerSearchResponse, CrawlingTask, ExtractedMaterialResult } from '../types/crawler';
+import type { CrawlerRule, CrawlerSearchRequest, CrawlerSearchResponse, CrawlingTask, ExtractedMaterialResult } from '../types/crawler';
 import { presetRules, getActivePresetRules, validateRuleConfig } from '../config/presetRules';
 import { ErrorHandler } from '../utils/errorHandler';
 import { TaskScheduler, TaskSchedulerConfig } from './TaskScheduler';

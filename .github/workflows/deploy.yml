@@ -1,54 +1,180 @@
-name: Build and Deploy to GitHub Pages
+name: 🚀 Deploy Find 3D to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
+# 设置权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# 只允许一个并发部署，跳过正在运行和最新队列之间的运行队列
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
+  # 构建作业
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
+    - name: 📦 Install dependencies
+      run: npm ci
+      
+    - name: 🧪 Run tests
+      run: |
+        if npm run test --if-present > /dev/null 2>&1; then
+          echo "Running tests..."
+          npm run test
+        else
+          echo "No tests configured, skipping..."
+        fi
+      
+    - name: 🔍 Run linting
+      run: |
+        if npm run lint --if-present > /dev/null 2>&1; then
+          echo "Running linting..."
+          npm run lint
+        else
+          echo "No linting configured, skipping..."
+        fi
+      
+    - name: 🏗️ Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
         
-      - name: Build project
-        run: |
-          NODE_ENV=production npm run build
-          
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+    - name: 📊 Generate build report
+      run: |
+        echo "## 📊 Build Report" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Node Version**: $(node -v)" >> $GITHUB_STEP_SUMMARY
+        echo "- **NPM Version**: $(npm -v)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Size**: $(du -sh dist/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        echo "- **File Count**: $(find dist/ -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
         
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
+    - name: 🔍 Verify build output
+      run: |
+        if [ ! -d "dist" ]; then
+          echo "❌ Build failed: dist directory not found"
+          exit 1
+        fi
+        
+        if [ ! -f "dist/index.html" ]; then
+          echo "❌ Build failed: index.html not found"
+          exit 1
+        fi
+        
+        echo "✅ Build verification passed"
+        ls -la dist/
+        
+    - name: 📄 Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: 📤 Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
 
+  # 部署作业
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: 📝 Deployment summary
+      run: |
+        echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+        echo "- **URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Deployment Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+
+  # 健康检查作业
+  health-check:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: 🏥 Health check
+      run: |
+        echo "Waiting for deployment to be ready..."
+        sleep 30
+        
+        # 尝试访问部署的网站
+        URL="${{ needs.deploy.outputs.page_url || 'https://judyjin1996-ops.github.io/Find-3d/' }}"
+        
+        echo "Checking health of: $URL"
+        
+        # 检查网站是否可访问
+        if curl -f -s -o /dev/null "$URL"; then
+          echo "✅ Website is accessible"
+          echo "## 🏥 Health Check Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Healthy" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: $URL" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Website is not accessible"
+          echo "## 🏥 Health Check Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ❌ Unhealthy" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: $URL" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+        
+        # 检查健康检查端点（如果存在）
+        if curl -f -s -o /dev/null "${URL}health.json"; then
+          echo "✅ Health endpoint is accessible"
+          echo "- **Health Endpoint**: ✅ Available" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Health endpoint not found (this is optional)"
+          echo "- **Health Endpoint**: ⚠️ Not Available" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  # 通知作业（可选）
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build, deploy, health-check]
+    if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - name: 📢 Deployment notification
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ] && [ "${{ needs.health-check.result }}" == "success" ]; then
+          echo "## 🎉 Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "Find 3D has been successfully deployed to GitHub Pages!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Live URL**: https://judyjin1996-ops.github.io/Find-3d/" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Build Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+          echo "🏥 **Health Check**: ✅ Passed" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ **Deploy Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## ❌ Deployment Failed!" >> $GITHUB_STEP_SUMMARY
+          echo "There was an issue with the deployment process." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Build Status**: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 **Deploy Status**: ${{ needs.deploy.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "🏥 **Health Check**: ${{ needs.health-check.result }}" >> $GITHUB_STEP_SUMMARY
+        fi

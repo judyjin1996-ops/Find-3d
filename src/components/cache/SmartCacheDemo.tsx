@@ -8,7 +8,7 @@ import { SmartCacheManager } from './SmartCacheManager';
 import { CachePerformanceMonitor } from './CachePerformanceMonitor';
 import { CacheStrategyConfig } from './CacheStrategyConfig';
 import { useSmartCache } from '../../hooks/useSmartCache';
-import { ExtractedMaterialResult } from '../../crawler/types/crawler';
+import type { ExtractedMaterialResult } from '../../crawler/types/crawler';
 import { CacheConfig } from '../../services/smartCacheService';
 
 export const SmartCacheDemo: React.FC = () => {

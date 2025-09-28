@@ -3,7 +3,7 @@
  * 实现多层缓存架构（内存、磁盘、远程）和智能缓存管理
  */
 
-import { ExtractedMaterialResult } from '../crawler/types/crawler';
+import type { ExtractedMaterialResult } from '../crawler/types/crawler';
 import { dataQualityManager, QualityMetrics } from '../utils/dataQualityManager';
 
 export interface CacheEntry<T = any> {

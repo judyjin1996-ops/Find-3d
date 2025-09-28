@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { CrawlingTask } from '../../crawler/types/crawler';
+import type { CrawlingTask } from '../../crawler/types/crawler';
 import './CrawlerTaskScheduler.css';
 
 interface TaskSchedulerStats {

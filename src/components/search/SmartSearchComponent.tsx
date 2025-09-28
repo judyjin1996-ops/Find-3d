@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { crawlerService } from '../../services/crawlerService';
-import { CrawlingTask } from '../../crawler/types/crawler';
+import type { CrawlingTask } from '../../crawler/types/crawler';
 import './SmartSearchComponent.css';
 
 export interface SmartSearchComponentProps {

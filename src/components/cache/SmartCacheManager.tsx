@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { CacheStats, CacheCategoryStats } from '../../services/smartCacheService';
+import type { CacheStats, CacheCategoryStats } from '../../services/smartCacheService';
 import './SmartCacheManager.css';
 
 interface SmartCacheManagerProps {

@@ -3,7 +3,7 @@
  * 负责清理和标准化爬取的数据
  */
 
-import { ExtractedMaterialResult, CrawlerRule } from '../types/crawler';
+import type { ExtractedMaterialResult, CrawlerRule } from '../types/crawler';
 
 export class DataCleaner {
   /**

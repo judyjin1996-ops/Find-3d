@@ -3,7 +3,7 @@
  * 包含主流3D素材网站的爬虫配置
  */
 
-import { CrawlerRule } from '../types/crawler';
+import type { CrawlerRule } from '../types/crawler';
 
 /**
  * 魔顿网 (modown.cn) 爬虫规则
@@ -25,31 +25,31 @@ const modownRule: CrawlerRule = {
   
   parseConfig: {
     listSelectors: {
-      // 更新搜索结果页面的选择器
-      container: '#main .content, .main-content, .posts, .search-results',
-      item: 'article, .post, .entry, [class*="post-"]',
-      link: 'h2 a, .entry-title a, .post-title a, a[href*="archives"]'
+      // 修复搜索结果页面的选择器 - 基于实际的魔顿网页面结构
+      container: '#main, .main, .content, .posts, .search-results, body',
+      item: 'article, .post, .entry, [class*="post"], h2, h3, .result-item',
+      link: 'h2 a[href*="archives"], h3 a[href*="archives"], .entry-title a[href*="archives"], .post-title a[href*="archives"], a[href*="archives"]'
     },
     detailSelectors: {
-      // 更新详情页面的选择器
-      title: 'h1.entry-title, .post-title h1, .single-title, h1',
-      description: '.entry-content p:first-of-type, .post-content p:first-of-type, .content p:first-of-type',
-      images: '.entry-content img, .post-content img, .wp-post-image, .featured-image img, img[src*="wp-content"]',
-      price: '.download-price, .price-info, .vip-price, [class*="price"]',
-      freeIndicator: '.free-download, .免费下载, .free-tag, [class*="free"]',
+      // 更新详情页面的选择器 - 基于魔顿网实际页面结构
+      title: 'h1.entry-title, .post-title h1, .single-title, h1, .title',
+      description: '.entry-content p:first-of-type, .post-content p:first-of-type, .content p:first-of-type, .excerpt, .summary',
+      images: '.entry-content img[src*="wp-content"], .post-content img[src*="wp-content"], .wp-post-image, .featured-image img, img[src*="uploads"], .attachment-post-thumbnail, .post-thumbnail img',
+      price: '.download-price, .price-info, .vip-price, [class*="price"], .cost, .money',
+      freeIndicator: '.free-download, .免费下载, .free-tag, [class*="free"], .gratis',
       fileInfo: {
-        format: '.file-type, .format-info, .download-format, [class*="format"]',
-        size: '.file-size, .size-info, .download-size, [class*="size"]'
+        format: '.file-type, .format-info, .download-format, [class*="format"], .extension',
+        size: '.file-size, .size-info, .download-size, [class*="size"], .filesize'
       },
       stats: {
-        downloads: '.download-count, .dl-count, .downloads, [class*="download"]',
-        views: '.view-count, .views, .post-views, [class*="view"]'
+        downloads: '.download-count, .dl-count, .downloads, [class*="download"], .down-num',
+        views: '.view-count, .views, .post-views, [class*="view"], .hit'
       },
       metadata: {
-        author: '.author-name, .post-author, .by-author, [class*="author"]',
-        tags: '.post-tags a, .tag-links a, .tags a, [rel="tag"]',
-        category: '.post-category a, .cat-links a, .category a',
-        uploadDate: '.post-date, .entry-date, .publish-date, time'
+        author: '.author-name, .post-author, .by-author, [class*="author"], .writer',
+        tags: '.post-tags a, .tag-links a, .tags a, [rel="tag"], .tagcloud a',
+        category: '.post-category a, .cat-links a, .category a, .breadcrumb a',
+        uploadDate: '.post-date, .entry-date, .publish-date, time, .date'
       }
     }
   },
@@ -63,7 +63,7 @@ const modownRule: CrawlerRule = {
     priceExtraction: {
       regex: '([\\d.]+)',
       currency: 'CNY',
-      freeKeywords: ['免费', 'free', '0元', '0.00', '免费下载', '免费资源', 'Free']
+      freeKeywords: ['免费', 'free', '0元', '0.00', '免费下载', '免费资源', 'Free', '免费素材', '不收费', '无需付费']
     },
     dateProcessing: {
       format: 'YYYY-MM-DD',
@@ -82,14 +82,14 @@ const modownRule: CrawlerRule = {
       viewport: { width: 1920, height: 1080 },
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       enableJavaScript: true,
-      waitForSelector: '#main, .content, .posts',
-      waitTime: 3000
+      waitForSelector: '#main, .content, .posts, body',
+      waitTime: 2000
     },
     requestConfig: {
-      delay: 3000,
+      delay: 2000,
       randomDelay: true,
       maxRetries: 3,
-      timeout: 45000
+      timeout: 30000
     },
     proxyConfig: {
       enabled: false,

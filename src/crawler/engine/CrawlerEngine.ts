@@ -4,7 +4,7 @@
  */
 
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { CrawlerRule, CrawlingTask, ExtractedMaterialResult, CrawlerSearchRequest, CrawlerSearchResponse, CrawlingError, CrawlerErrorType } from '../types/crawler';
+import type { CrawlerRule, CrawlingTask, ExtractedMaterialResult, CrawlerSearchRequest, CrawlerSearchResponse, CrawlingError, CrawlerErrorType } from '../types/crawler';
 import { ContentExtractor } from './ContentExtractor';
 import { AntiDetection } from './AntiDetection';
 import { ErrorHandler } from '../utils/errorHandler';
@@ -257,19 +257,28 @@ export class CrawlerEngine {
    */
   private async extractResultLinks(page: Page, rule: CrawlerRule): Promise<string[]> {
     try {
-      const links = await page.evaluate((selectors, baseUrl) => {
+      const links = await page.evaluate((selectors, baseUrl, websiteName) => {
+        console.log(`开始提取 ${websiteName} 的搜索结果链接`);
+        console.log('选择器配置:', selectors);
+        
         // 尝试多个容器选择器
         const containerSelectors = selectors.container.split(',').map(s => s.trim());
         let container = null;
         
         for (const selector of containerSelectors) {
-          container = document.querySelector(selector);
-          if (container) break;
+          try {
+            container = document.querySelector(selector);
+            if (container) {
+              console.log(`找到容器元素: ${selector}`);
+              break;
+            }
+          } catch (e) {
+            console.log(`容器选择器无效: ${selector}`);
+          }
         }
         
         if (!container) {
-          console.log('未找到容器元素，尝试查找所有可能的文章元素');
-          // 如果没找到容器，直接在整个页面查找
+          console.log('未找到指定容器，使用整个页面作为容器');
           container = document.body;
         }
 
@@ -278,64 +287,156 @@ export class CrawlerEngine {
         let items: NodeListOf<Element> | null = null;
         
         for (const selector of itemSelectors) {
-          items = container.querySelectorAll(selector);
-          if (items.length > 0) break;
+          try {
+            items = container.querySelectorAll(selector);
+            if (items.length > 0) {
+              console.log(`找到 ${items.length} 个项目元素: ${selector}`);
+              break;
+            }
+          } catch (e) {
+            console.log(`项目选择器无效: ${selector}`);
+          }
         }
         
         if (!items || items.length === 0) {
-          console.log('未找到文章项目元素');
+          console.log('未找到文章项目元素，尝试通用选择器');
+          // 尝试通用的文章选择器
+          const fallbackSelectors = [
+            'article',
+            '.post',
+            '.entry',
+            '[class*="post"]',
+            '[class*="entry"]',
+            '[class*="item"]',
+            'h2 a[href*="archives"]',
+            'h3 a[href*="archives"]',
+            'a[href*="archives"]'
+          ];
+          
+          for (const fallback of fallbackSelectors) {
+            try {
+              items = container.querySelectorAll(fallback);
+              if (items.length > 0) {
+                console.log(`通过通用选择器找到 ${items.length} 个元素: ${fallback}`);
+                break;
+              }
+            } catch (e) {
+              continue;
+            }
+          }
+        }
+        
+        if (!items || items.length === 0) {
+          console.log('完全未找到任何项目元素');
           return [];
         }
 
         const links: string[] = [];
         const linkSelectors = selectors.link.split(',').map(s => s.trim());
+        
+        // 添加通用链接选择器作为备选
+        const fallbackLinkSelectors = [
+          'a[href*="archives"]',
+          'h2 a',
+          'h3 a',
+          '.title a',
+          '.entry-title a',
+          '.post-title a',
+          'a'
+        ];
+        
+        const allLinkSelectors = [...linkSelectors, ...fallbackLinkSelectors];
 
-        items.forEach(item => {
-          for (const linkSelector of linkSelectors) {
-            const linkElement = item.querySelector(linkSelector) as HTMLAnchorElement;
-            if (linkElement) {
-              let href = linkElement.href || linkElement.getAttribute('href');
+        items.forEach((item, index) => {
+          let foundLink = false;
+          
+          for (const linkSelector of allLinkSelectors) {
+            if (foundLink) break;
+            
+            try {
+              const linkElements = item.querySelectorAll(linkSelector) as NodeListOf<HTMLAnchorElement>;
               
-              if (href) {
-                // 处理相对链接
-                if (href.startsWith('/')) {
-                  href = baseUrl + href;
-                } else if (href.startsWith('./')) {
-                  href = baseUrl + href.substring(1);
-                } else if (!href.startsWith('http')) {
-                  href = baseUrl + '/' + href;
-                }
+              for (const linkElement of linkElements) {
+                let href = linkElement.href || linkElement.getAttribute('href');
                 
-                // 只添加指向archives的链接（魔顿网的文章链接格式）
-                if (href.includes('/archives/') || href.includes('archives')) {
-                  links.push(href);
-                  break; // 找到一个有效链接就跳出内层循环
+                if (href) {
+                  // 处理相对链接
+                  if (href.startsWith('/')) {
+                    href = baseUrl.replace(/\/$/, '') + href;
+                  } else if (href.startsWith('./')) {
+                    href = baseUrl.replace(/\/$/, '') + href.substring(1);
+                  } else if (!href.startsWith('http')) {
+                    href = baseUrl.replace(/\/$/, '') + '/' + href;
+                  }
+                  
+                  // 验证链接是否有效
+                  const isValidLink = href.startsWith('http') && (
+                    href.includes('/archives/') || 
+                    href.includes('archives') ||
+                    href.includes('/post/') ||
+                    href.includes('/item/') ||
+                    href.includes('/detail/') ||
+                    (href.includes(baseUrl.replace(/https?:\/\//, '').replace(/\/$/, '')) && 
+                     href !== baseUrl && 
+                     !href.includes('#') && 
+                     !href.includes('javascript:') &&
+                     !href.includes('mailto:'))
+                  );
+                  
+                  if (isValidLink && !links.includes(href)) {
+                    console.log(`找到有效链接 [${index}]: ${href}`);
+                    links.push(href);
+                    foundLink = true;
+                    break;
+                  }
                 }
               }
+            } catch (e) {
+              console.log(`链接选择器错误: ${linkSelector}`, e);
             }
           }
         });
 
-        console.log(`找到 ${links.length} 个有效链接`);
+        console.log(`总共找到 ${links.length} 个有效链接`);
         return links;
-      }, rule.parseConfig.listSelectors, rule.baseUrl);
+      }, rule.parseConfig.listSelectors, rule.baseUrl, rule.websiteName);
 
-      // 过滤和验证链接
+      // 进一步过滤和验证链接
       const validLinks = links.filter(link => {
         if (!link || !link.startsWith('http')) return false;
         
-        // 确保是目标网站的链接
         try {
           const url = new URL(link);
           const baseUrl = new URL(rule.baseUrl);
-          return url.hostname === baseUrl.hostname;
+          
+          // 确保是目标网站的链接
+          if (url.hostname !== baseUrl.hostname) return false;
+          
+          // 排除一些明显不是内容页的链接
+          const excludePatterns = [
+            '/category/',
+            '/tag/',
+            '/author/',
+            '/page/',
+            '/search',
+            '/login',
+            '/register',
+            '/admin',
+            '#comment',
+            '#respond'
+          ];
+          
+          return !excludePatterns.some(pattern => link.includes(pattern));
         } catch {
           return false;
         }
       });
 
-      console.log(`✅ 提取到 ${validLinks.length} 个有效链接`);
-      return validLinks.slice(0, 20); // 限制链接数量
+      console.log(`✅ 最终提取到 ${validLinks.length} 个有效链接`);
+      
+      // 去重并限制数量
+      const uniqueLinks = [...new Set(validLinks)];
+      return uniqueLinks.slice(0, 20);
     } catch (error) {
       console.error('提取搜索结果链接失败:', error);
       return [];

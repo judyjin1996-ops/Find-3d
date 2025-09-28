@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { UserConfig, DisplayField, userConfigService } from '../../services/userConfigService';
+import type { UserConfig, DisplayField, userConfigService } from '../../services/userConfigService';
 
 interface UserConfigManagerProps {
   onConfigChange?: (config: UserConfig) => void;

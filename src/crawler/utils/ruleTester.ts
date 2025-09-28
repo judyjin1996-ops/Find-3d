@@ -3,7 +3,7 @@
  * 用于测试和验证爬虫规则的有效性
  */
 
-import { CrawlerRule, ExtractedMaterialResult, TestResult } from '../types/crawler';
+import type { CrawlerRule, ExtractedMaterialResult, TestResult } from '../types/crawler';
 import { CrawlerEngine } from '../engine/CrawlerEngine';
 import { DataValidator } from './dataValidator';
 

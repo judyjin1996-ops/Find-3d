@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'puppeteer';
-import { CrawlerRule } from '../types/crawler';
+import type { CrawlerRule } from '../types/crawler';
 import { DataCleaner } from '../utils/dataCleaner';
 import { DataValidator } from '../utils/dataValidator';
 import { SmartExtractor } from './SmartExtractor';
@@ -94,40 +94,116 @@ export class ContentExtractor {
           const imageSelectors = selectors.images.split(',').map(s => s.trim());
           const allImages: any[] = [];
           
+          console.log('开始提取图片，选择器:', imageSelectors);
+          
           for (const selector of imageSelectors) {
-            const imageElements = document.querySelectorAll(selector);
-            Array.from(imageElements).forEach((img: any) => {
-              let imageUrl = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy') || img.getAttribute('data-original');
+            try {
+              const imageElements = document.querySelectorAll(selector);
+              console.log(`选择器 "${selector}" 找到 ${imageElements.length} 个图片元素`);
               
-              if (imageUrl) {
-                // 处理相对URL
-                if (imageUrl.startsWith('/')) {
-                  imageUrl = baseUrl + imageUrl;
-                } else if (imageUrl.startsWith('./')) {
-                  imageUrl = baseUrl + imageUrl.substring(1);
-                } else if (!imageUrl.startsWith('http')) {
-                  imageUrl = baseUrl + '/' + imageUrl;
+              Array.from(imageElements).forEach((img: any, index) => {
+                // 尝试多种图片URL获取方式
+                let imageUrl = img.src || 
+                              img.getAttribute('data-src') || 
+                              img.getAttribute('data-lazy') || 
+                              img.getAttribute('data-original') ||
+                              img.getAttribute('data-srcset')?.split(' ')[0] ||
+                              img.getAttribute('srcset')?.split(' ')[0];
+                
+                if (imageUrl) {
+                  // 处理相对URL
+                  if (imageUrl.startsWith('//')) {
+                    imageUrl = 'https:' + imageUrl;
+                  } else if (imageUrl.startsWith('/')) {
+                    imageUrl = baseUrl.replace(/\/$/, '') + imageUrl;
+                  } else if (imageUrl.startsWith('./')) {
+                    imageUrl = baseUrl.replace(/\/$/, '') + imageUrl.substring(1);
+                  } else if (!imageUrl.startsWith('http')) {
+                    imageUrl = baseUrl.replace(/\/$/, '') + '/' + imageUrl;
+                  }
+                  
+                  // 改进的图片过滤逻辑
+                  const isValidPreview = imageUrl.startsWith('http') && 
+                                        !imageUrl.includes('avatar') && 
+                                        !imageUrl.includes('icon') && 
+                                        !imageUrl.includes('logo') &&
+                                        !imageUrl.includes('emoji') &&
+                                        !imageUrl.includes('smilie') &&
+                                        !imageUrl.includes('button') &&
+                                        !imageUrl.includes('banner') &&
+                                        !imageUrl.includes('ad') &&
+                                        !imageUrl.includes('advertisement') &&
+                                        // 图片尺寸过滤 - 排除太小的图片
+                                        (img.width === undefined || img.width > 100) &&
+                                        (img.height === undefined || img.height > 100) &&
+                                        // 包含关键路径的图片更可能是预览图
+                                        (imageUrl.includes('wp-content') || 
+                                         imageUrl.includes('upload') || 
+                                         imageUrl.includes('image') ||
+                                         imageUrl.includes('thumb') ||
+                                         imageUrl.includes('preview') ||
+                                         imageUrl.includes('screenshot') ||
+                                         imageUrl.includes('pic') ||
+                                         imageUrl.includes('photo') ||
+                                         // 或者是常见的图片格式
+                                         /\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i.test(imageUrl));
+                  
+                  if (isValidPreview) {
+                    console.log(`找到有效预览图 [${index}]: ${imageUrl}`);
+                    allImages.push({
+                      url: imageUrl,
+                      alt: img.alt || img.title || '',
+                      size: 'medium' as const
+                    });
+                  } else {
+                    console.log(`跳过无效图片 [${index}]: ${imageUrl}`);
+                  }
+                } else {
+                  console.log(`图片元素 [${index}] 没有有效的URL`);
                 }
-                
-                // 过滤掉明显不是预览图的图片
-                const isValidPreview = !imageUrl.includes('avatar') && 
-                                     !imageUrl.includes('icon') && 
-                                     !imageUrl.includes('logo') &&
-                                     !imageUrl.includes('emoji') &&
-                                     (imageUrl.includes('wp-content') || 
-                                      imageUrl.includes('upload') || 
-                                      imageUrl.includes('image') ||
-                                      imageUrl.includes('thumb'));
-                
-                if (isValidPreview) {
-                  allImages.push({
-                    url: imageUrl,
-                    alt: img.alt || '',
-                    size: 'medium' as const
+              });
+            } catch (e) {
+              console.log(`图片选择器错误: ${selector}`, e);
+            }
+          }
+          
+          // 如果没有找到图片，尝试通用选择器
+          if (allImages.length === 0) {
+            console.log('未找到图片，尝试通用选择器');
+            const fallbackSelectors = [
+              'img[src*="wp-content"]',
+              'img[src*="upload"]',
+              'img[src*="image"]',
+              'img[src*="thumb"]',
+              '.post img',
+              '.entry img',
+              '.content img',
+              'article img'
+            ];
+            
+            for (const fallback of fallbackSelectors) {
+              try {
+                const images = document.querySelectorAll(fallback);
+                if (images.length > 0) {
+                  console.log(`通过通用选择器找到 ${images.length} 个图片: ${fallback}`);
+                  Array.from(images).slice(0, 3).forEach((img: any) => {
+                    let imageUrl = img.src;
+                    if (imageUrl && imageUrl.startsWith('http') && 
+                        (img.width === undefined || img.width > 100) &&
+                        (img.height === undefined || img.height > 100)) {
+                      allImages.push({
+                        url: imageUrl,
+                        alt: img.alt || '',
+                        size: 'medium' as const
+                      });
+                    }
                   });
+                  break;
                 }
+              } catch (e) {
+                continue;
               }
-            });
+            }
           }
           
           // 去重并限制数量
@@ -136,6 +212,7 @@ export class ContentExtractor {
           );
           
           data.images = uniqueImages.slice(0, 5); // 最多5张图片
+          console.log(`最终提取到 ${data.images.length} 张有效图片`);
         }
 
         // 提取价格信息 - 改进的价格提取

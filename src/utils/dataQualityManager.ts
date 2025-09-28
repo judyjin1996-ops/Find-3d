@@ -3,7 +3,7 @@
  * 提供数据去重、质量评估和优化功能
  */
 
-import { ExtractedMaterialResult } from '../crawler/types/crawler';
+import type { ExtractedMaterialResult } from '../crawler/types/crawler';
 
 export interface QualityMetrics {
   completeness: number; // 完整性评分 0-100

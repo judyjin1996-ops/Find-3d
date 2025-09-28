@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ProxyConfig, ProxyStatus } from '../../crawler/utils/proxyManager';
+import type { ProxyConfig, ProxyStatus } from '../../crawler/utils/proxyManager';
 import { RateLimitConfig } from '../../crawler/utils/rateLimiter';
 
 interface AntiCrawlerManagerProps {

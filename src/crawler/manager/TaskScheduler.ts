@@ -3,7 +3,7 @@
  * 负责管理爬虫任务的队列、调度和执行
  */
 
-import { CrawlingTask, CrawlerSearchRequest, CrawlerRule, ExtractedMaterialResult, CrawlingError, CrawlerErrorType } from '../types/crawler';
+import type { CrawlingTask, CrawlerSearchRequest, CrawlerRule, ExtractedMaterialResult, CrawlingError, CrawlerErrorType } from '../types/crawler';
 import { EventEmitter } from 'events';
 
 export interface TaskSchedulerConfig {

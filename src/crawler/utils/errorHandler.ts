@@ -2,7 +2,7 @@
  * 爬虫错误处理工具
  */
 
-import { CrawlingError, CrawlerErrorType } from '../types/crawler';
+import type { CrawlingError, CrawlerErrorType } from '../types/crawler';
 
 export class ErrorHandler {
   /**

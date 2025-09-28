@@ -3,7 +3,7 @@
  * 负责管理爬虫规则的存储、加载和验证
  */
 
-import { CrawlerRule } from '../types/crawler';
+import type { CrawlerRule } from '../types/crawler';
 
 export class ConfigManager {
   private static readonly STORAGE_KEY = 'crawler_config';

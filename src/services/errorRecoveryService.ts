@@ -3,7 +3,7 @@
  * 提供自动错误恢复和系统自愈能力
  */
 
-import { CrawlingError, CrawlerErrorType } from '../crawler/types/crawler';
+import type { CrawlingError, CrawlerErrorType } from '../crawler/types/crawler';
 import { systemHealthMonitor } from './systemHealthMonitor';
 import { proxyManager } from '../crawler/utils/proxyManager';
 import { rateLimiter } from '../crawler/utils/rateLimiter';

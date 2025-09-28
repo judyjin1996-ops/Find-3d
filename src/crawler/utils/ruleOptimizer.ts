@@ -3,8 +3,8 @@
  * 自动分析和优化爬虫规则配置
  */
 
-import { CrawlerRule } from '../types/crawler';
-import { DetailedTestResult } from './ruleTester';
+import type { CrawlerRule } from '../types/crawler';
+import type { DetailedTestResult } from './ruleTester';
 
 export interface OptimizationSuggestion {
   type: 'selector' | 'timing' | 'quality' | 'performance' | 'antibot';

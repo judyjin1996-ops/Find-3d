@@ -3,7 +3,7 @@
  * 负责图片的下载、处理、缓存和优化
  */
 
-import { CrawlerRule } from '../types/crawler';
+import type { CrawlerRule } from '../types/crawler';
 
 export interface ProcessedImage {
   originalUrl: string;
@@ -202,44 +202,56 @@ export class ImageProcessor {
   } | null> {
     try {
       // 在浏览器环境中，我们只能通过Image对象获取基本信息
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const img = new Image();
+        let resolved = false;
         
-        // 设置跨域属性
-        img.crossOrigin = 'anonymous';
+        // 设置跨域属性 - 但不强制要求
+        try {
+          img.crossOrigin = 'anonymous';
+        } catch (e) {
+          // 忽略跨域设置错误
+        }
         
-        img.onload = () => {
+        const resolveWithInfo = (width: number, height: number) => {
+          if (resolved) return;
+          resolved = true;
           resolve({
-            width: img.naturalWidth || img.width,
-            height: img.naturalHeight || img.height,
+            width: width || 300,
+            height: height || 200,
             size: 0, // 无法在浏览器中直接获取文件大小
             format: this.getImageFormat(url)
           });
         };
         
-        img.onerror = (error) => {
-          console.warn(`图片加载失败: ${url}`, error);
-          // 即使加载失败，也返回基本信息
-          resolve({
-            width: 300,
-            height: 200,
-            size: 0,
-            format: this.getImageFormat(url)
-          });
+        img.onload = () => {
+          const width = img.naturalWidth || img.width || 300;
+          const height = img.naturalHeight || img.height || 200;
+          console.log(`✅ 图片加载成功: ${url} (${width}x${height})`);
+          resolveWithInfo(width, height);
         };
         
-        // 设置超时
-        setTimeout(() => {
-          console.warn(`图片加载超时: ${url}`);
-          resolve({
-            width: 300,
-            height: 200,
-            size: 0,
-            format: this.getImageFormat(url)
-          });
-        }, 5000); // 减少超时时间到5秒
+        img.onerror = (error) => {
+          console.warn(`⚠️ 图片加载失败，使用默认尺寸: ${url}`);
+          // 即使加载失败，也返回基本信息，让前端可以显示占位图
+          resolveWithInfo(300, 200);
+        };
         
-        img.src = url;
+        // 设置超时 - 减少等待时间
+        setTimeout(() => {
+          if (!resolved) {
+            console.warn(`⏰ 图片加载超时，使用默认尺寸: ${url}`);
+            resolveWithInfo(300, 200);
+          }
+        }, 3000); // 减少超时时间到3秒
+        
+        // 开始加载图片
+        try {
+          img.src = url;
+        } catch (e) {
+          console.warn(`❌ 图片URL无效: ${url}`);
+          resolveWithInfo(300, 200);
+        }
       });
     } catch (error) {
       console.error('获取图片信息失败:', error);

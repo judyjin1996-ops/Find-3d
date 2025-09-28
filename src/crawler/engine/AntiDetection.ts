@@ -5,7 +5,7 @@
 
 import { Page } from 'puppeteer';
 import UserAgent from 'user-agents';
-import { CrawlerRule } from '../types/crawler';
+import type { CrawlerRule } from '../types/crawler';
 import { proxyManager, ProxyConfig } from '../utils/proxyManager';
 import { rateLimiter } from '../utils/rateLimiter';
 

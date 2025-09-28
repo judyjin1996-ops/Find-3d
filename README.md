@@ -1,14 +1,24 @@
 # 🎨 Find 3D - 三维素材搜索平台
 
-> 专为三维设计师打造的多网站聚合搜索工具
+<div align="center">
 
-[![部署状态](https://api.netlify.com/api/v1/badges/你的-netlify-id/deploy-status)](https://app.netlify.com/sites/你的项目名/deploys)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-部署中-blue)](https://你的用户名.github.io/find-3d/)
+![Find 3D Logo](https://img.shields.io/badge/Find%203D-v2.0.0-blue?style=for-the-badge&logo=3d&logoColor=white)
+
+**专为三维设计师打造的智能素材搜索平台**
+
+[![GitHub Stars](https://img.shields.io/github/stars/judyjin1996-ops/Find-3d?style=social)](https://github.com/judyjin1996-ops/Find-3d)
+[![GitHub Forks](https://img.shields.io/github/forks/judyjin1996-ops/Find-3d?style=social)](https://github.com/judyjin1996-ops/Find-3d)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/judyjin1996-ops/Find-3d/actions)
+
+[🌐 在线体验](https://judyjin1996-ops.github.io/Find-3d/) | [📖 使用指南](./使用指南.md) | [🚀 部署指南](./DEPLOYMENT_GUIDE.md) | [🐛 问题反馈](https://github.com/judyjin1996-ops/Find-3d/issues)
+
+</div>
 
 ## 🌟 在线演示
 
-- **Netlify部署**: [https://你的项目名.netlify.app](https://你的项目名.netlify.app)
-- **GitHub Pages**: [https://你的用户名.github.io/find-3d](https://你的用户名.github.io/find-3d)
+- **GitHub Pages**: [https://judyjin1996-ops.github.io/Find-3d/](https://judyjin1996-ops.github.io/Find-3d/)
+- **项目仓库**: [https://github.com/judyjin1996-ops/Find-3d](https://github.com/judyjin1996-ops/Find-3d)
 
 ## 📋 项目简介
 
@@ -47,10 +57,10 @@ Find 3D是一个现代化的3D素材搜索平台，旨在为三维设计师提�
 
 ```bash
 # 克隆项目
-git clone https://github.com/你的用户名/find-3d.git
+git clone https://github.com/judyjin1996-ops/Find-3d.git
 
 # 进入项目目录
-cd find-3d
+cd Find-3d
 
 # 安装依赖
 npm install
@@ -60,6 +70,10 @@ npm run dev
 
 # 构建生产版本
 npm run build
+
+# 生产环境部署
+chmod +x scripts/deploy-production.sh
+./scripts/deploy-production.sh
 ```
 
 ## 🛠️ 技术栈
@@ -153,12 +167,19 @@ find-3d/
 
 ## 📞 联系方式
 
-- **项目地址**: [GitHub仓库](https://github.com/你的用户名/find-3d)
-- **问题反馈**: [Issues页面](https://github.com/你的用户名/find-3d/issues)
-- **功能建议**: [Discussions页面](https://github.com/你的用户名/find-3d/discussions)
+- **项目地址**: [GitHub仓库](https://github.com/judyjin1996-ops/Find-3d)
+- **问题反馈**: [Issues页面](https://github.com/judyjin1996-ops/Find-3d/issues)
+- **功能建议**: [Discussions页面](https://github.com/judyjin1996-ops/Find-3d/discussions)
+- **邮箱联系**: [judyjin1996.ops@gmail.com](mailto:judyjin1996.ops@gmail.com)
 
 ---
 
-⭐ 如果这个项目对你有帮助，请给个Star支持一下！
+<div align="center">
 
-🔗 **快速链接**: [在线演示](https://你的项目名.netlify.app) | [使用文档](./docs/) | [API文档](./docs/api.md)
+**如果这个项目对你有帮助，请给我们一个 ⭐ Star！**
+
+🔗 **快速链接**: [在线演示](https://judyjin1996-ops.github.io/Find-3d/) | [使用文档](./使用指南.md) | [部署指南](./DEPLOYMENT_GUIDE.md)
+
+Made with ❤️ by [judyjin1996-ops](https://github.com/judyjin1996-ops)
+
+</div>

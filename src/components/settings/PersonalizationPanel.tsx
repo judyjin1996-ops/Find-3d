@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { userConfigService, SearchHistoryItem } from '../../services/userConfigService';
-import { ExtractedMaterialResult } from '../../crawler/types/crawler';
+import type { ExtractedMaterialResult } from '../../crawler/types/crawler';
 
 interface PersonalizationPanelProps {
   onSearchRecommendation?: (query: string) => void;
